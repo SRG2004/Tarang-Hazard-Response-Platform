@@ -1482,6 +1482,98 @@ app.get('/analytics/dashboard', verifyAuth, async (req, res) => {
   }
 });
 
+// ==================== DATA EXPORT ====================
+app.get('/admin/export-data', verifyAuth, async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (role !== 'admin' && role !== 'authority') {
+      return res.status(403).json({ success: false, error: 'Unauthorized: Admin or Authority access required' });
+    }
+
+    const { type, format = 'csv', range = 'all' } = req.query;
+    let collectionName = '';
+    let fields = [];
+
+    switch (type) {
+      case 'reports':
+        collectionName = 'reports';
+        fields = ['id', 'title', 'location', 'severity', 'status', 'type', 'submittedAt', 'description', 'userId'];
+        break;
+      case 'users':
+        collectionName = 'users';
+        fields = ['uid', 'name', 'email', 'role', 'phone', 'createdAt', 'status'];
+        break;
+      case 'volunteers':
+        collectionName = 'volunteers';
+        fields = ['userId', 'name', 'skills', 'status', 'location', 'availability', 'rating'];
+        break;
+      case 'donations':
+        collectionName = 'donations';
+        fields = ['id', 'donorName', 'amount', 'currency', 'status', 'paymentMethod', 'createdAt', 'campaignId'];
+        break;
+      default:
+        return res.status(400).json({ success: false, error: 'Invalid data type' });
+    }
+
+    let query = db.collection(collectionName);
+
+    // Apply date range filter
+    if (range !== 'all') {
+      const now = new Date();
+      let startDate = new Date();
+
+      if (range === 'today') startDate.setHours(0, 0, 0, 0);
+      else if (range === 'week') startDate.setDate(now.getDate() - 7);
+      else if (range === 'month') startDate.setDate(now.getDate() - 30);
+      else if (range === 'year') startDate.setFullYear(now.getFullYear() - 1);
+
+      // Use correct timestamp field (default to createdAt)
+      const dateField = (type === 'reports') ? 'submittedAt' : 'createdAt';
+      query = query.where(dateField, '>=', startDate);
+    }
+
+    const snapshot = await query.get();
+    const data = snapshot.docs.map(doc => {
+      const docData = doc.data();
+      // Format timestamps
+      for (const key in docData) {
+        if (docData[key] && docData[key].toDate) {
+          docData[key] = docData[key].toDate().toISOString();
+        }
+      }
+      return { id: doc.id, ...docData };
+    });
+
+    if (format === 'json') {
+      res.header('Content-Type', 'application/json');
+      res.attachment(`${type}-${range}-export.json`);
+      return res.send(JSON.stringify(data, null, 2));
+    } else if (format === 'csv') {
+      // Manual CSV conversion
+      const header = fields.join(',');
+      const rows = data.map(item => {
+        return fields.map(field => {
+          let val = item[field] || '';
+          if (Array.isArray(val)) val = val.join(';');
+          if (typeof val === 'string' && val.includes(',')) val = `"${val}"`;
+          return val;
+        }).join(',');
+      });
+
+      const csv = [header, ...rows].join('\n');
+      res.header('Content-Type', 'text/csv');
+      res.attachment(`${type}-${range}-export.csv`);
+      return res.send(csv);
+    } else {
+      return res.status(400).json({ success: false, error: 'Invalid format' });
+    }
+
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ==================== ERROR HANDLING ====================
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

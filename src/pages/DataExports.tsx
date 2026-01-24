@@ -3,6 +3,7 @@ import { PageContainer, PageHeader, ContentSection } from '../components/ui-rede
 import { AnimatedSelect, FormSection, ActionButtons } from '../components/ui-redesign/Forms';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
+import apiService from '../services/apiService';
 
 export function DataExports() {
   const [dataType, setDataType] = useState('');
@@ -18,10 +19,19 @@ export function DataExports() {
 
     setExporting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const blob = await apiService.exportSystemData(dataType, format, dateRange);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tarang-${dataType}-${dateRange}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
       toast.success('Export completed successfully');
     } catch (error) {
-      toast.error('Export failed');
+      console.error('Export failed:', error);
+      toast.error('Failed to export data');
     } finally {
       setExporting(false);
     }

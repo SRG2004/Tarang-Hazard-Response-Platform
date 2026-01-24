@@ -1483,6 +1483,27 @@ export const createDonation = async (donationData: any) => {
   );
 };
 
+// ==================== DATA EXPORT ====================
+
+export const exportSystemData = async (type: string, format: string, range: string) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('User not authenticated');
+    const token = await currentUser.getIdToken();
+
+    const response = await apiClient.get('/admin/export-data', {
+      params: { type, format, range },
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob'
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Export error:', error);
+    throw error;
+  }
+};
+
 // ==================== INFRASTRUCTURE ====================
 
 export const getEmergencyInfrastructure = async () => {
@@ -2156,7 +2177,7 @@ export default {
   getReport,
 
   getReportStats,
-  exportData,
+  exportSystemData,
 
   // Impact Reports
   submitImpactReport,

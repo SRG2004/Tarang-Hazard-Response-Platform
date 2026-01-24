@@ -204,8 +204,8 @@ export const FormSection: React.FC<FormSectionProps> = ({ title, description, ch
 interface ActionButtonsProps {
     onCancel?: () => void;
     onSubmit: () => void;
-    submitLabel?: string;
-    cancelLabel?: string;
+    submitLabel?: React.ReactNode;
+    cancelLabel?: React.ReactNode;
     isSubmitting?: boolean;
     disabled?: boolean;
 }
