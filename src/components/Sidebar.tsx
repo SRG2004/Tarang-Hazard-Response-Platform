@@ -9,7 +9,6 @@ import {
   Settings,
   Map,
   BarChart3,
-  MessageSquare,
   Package,
   UserCog,
   FileCheck,
@@ -82,7 +81,7 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
 
     // Authority Routes
     '/reports': { name: t('nav.reports'), href: 'reports', icon: FileCheck },
-    '/social-media-verification': { name: t('nav.socialMediaVerification'), href: 'social-media-verification', icon: MessageSquare },
+
     '/flash-sms': { name: t('nav.flashSmsAlert'), href: 'flash-sms', icon: AlertCircle },
     '/insights': { name: t('nav.insights'), href: 'insights', icon: BarChart3 },
     '/volunteers': { name: t('nav.volunteers'), href: 'volunteers', icon: Users },
