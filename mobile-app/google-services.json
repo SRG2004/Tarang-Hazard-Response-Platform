@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "953217940892",
+    "project_id": "tarang-incois",
+    "storage_bucket": "tarang-incois.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953217940892:android:c10bb4c5e16457127e5c59",
+        "android_client_info": {
+          "package_name": "com.tarang.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953217940892-ttfc1kdsaps3prj30c5p6dd3arqjrn89.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzsM4YIT3ZrOh87uPk46T_uv2uW3qtM9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953217940892-ttfc1kdsaps3prj30c5p6dd3arqjrn89.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

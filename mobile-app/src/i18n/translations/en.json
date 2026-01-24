@@ -1,0 +1,78 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "submit": "Submit",
+        "back": "Back"
+    },
+    "auth": {
+        "login": "Login",
+        "logout": "Logout",
+        "googleLogin": "Sign in with Google",
+        "phoneLogin": "Sign in with Phone"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "reportHazard": "Report Hazard",
+        "mapView": "Hazard Map",
+        "socialFeed": "Social Feed",
+        "fisherman": "Fisherman Zone",
+        "reports": "Manage Reports",
+        "verifyPosts": "Verify Posts",
+        "flashSms": "Flash SMS Alert",
+        "manageFisherman": "Manage Fisherman",
+        "manageVolunteers": "Manage Volunteers",
+        "manageDonations": "Manage Donations",
+        "manageUsers": "Manage Users",
+        "mlModels": "ML Models",
+        "chatBot": "Help / ChatBot",
+        "emergencyContacts": "Emergency Contacts",
+        "settings": "Settings",
+        "hazardDrills": "Hazard Drills",
+        "volunteerRegistration": "Volunteer Registration",
+        "donate": "Donate"
+    },
+    "dashboard": {
+        "welcome": "Welcome",
+        "activeAlerts": "Active Alerts",
+        "weather": "Weather",
+        "recentReports": "Recent Reports"
+    },
+    "drills": {
+        "title": "Hazard Drills",
+        "subtitle": "Participate in drills to stay prepared.",
+        "noDrills": "No drills scheduled at the moment.",
+        "date": "Date",
+        "location": "Location"
+    },
+    "donate": {
+        "title": "Support Our Mission",
+        "subtitle": "Your contributions help us maintain the Tarang alert system, conduct safety drills, and support coastal communities during emergencies.",
+        "bankTransfer": "Bank Transfer",
+        "bankName": "Bank Name",
+        "accountName": "Account Name",
+        "accountNo": "Account No",
+        "ifsc": "IFSC Code",
+        "upi": "UPI / QR Code",
+        "qrPlaceholder": "QR Code Image Here",
+        "button": "Donate via Website"
+    },
+    "settings": {
+        "notifications": "Notifications",
+        "emailNotifications": "Email Notifications",
+        "smsAlerts": "SMS Alerts",
+        "coastalAlerts": "Coastal Alerts",
+        "privacy": "Privacy",
+        "showProfilePublicly": "Show Profile Publicly",
+        "shareLocation": "Share Location",
+        "accessibility": "Accessibility",
+        "audioAlerts": "Audio Alerts",
+        "voiceInput": "Voice Input",
+        "highContrast": "High Contrast"
+    }
+}

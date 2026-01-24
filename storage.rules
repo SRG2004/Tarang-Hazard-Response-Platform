@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Reports media (photos and videos)
+    match /reports/{userId}/{allPaths=**} {
+      // Anyone authenticated can read
+      allow read: if request.auth != null;
+      
+      // Only the owner can upload
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        // Max file size: 10MB
+        request.resource.size < 10 * 1024 * 1024 &&
+        // Only images and videos
+        (request.resource.contentType.matches('image/.*') || 
+         request.resource.contentType.matches('video/.*'));
+    }
+    
+    // Profile pictures
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
+    }
+    
+    // Hazard drill images (admins can upload, everyone can read)
+    match /hazard-drills/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
+    }
+    
+    // Hazard report photos (anyone authenticated can upload for reporting)
+    match /hazard-photos/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        request.resource.size < 10 * 1024 * 1024 &&
+        (request.resource.contentType.matches('image/.*') || 
+         request.resource.contentType.matches('video/.*'));
+    }
+  }
+}
+

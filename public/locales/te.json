@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "తరంగం",
+    "description": "సముద్ర హాని నివేదన మరియు పర్యవేక్షణ వేదిక"
+  },
+  "nav": {
+    "home": "హోమ్",
+    "report": "నివేదన",
+    "dashboard": "డాష్బోర్డ్",
+    "analytics": "విశ్లేషణ",
+    "login": "లాగిన్",
+    "logout": "లాగౌట్",
+    "profile": "ప్రొఫైల్"
+  },
+  "auth": {
+    "login": "లాగిన్",
+    "register": "నమోదు",
+    "email": "ఇమెయిల్",
+    "password": "పాస్వర్డ్",
+    "name": "పేరు",
+    "role": "పాత్ర",
+    "citizen": "పౌరుడు",
+    "official": "అధికారి",
+    "analyst": "విశ్లేషకుడు",
+    "loginSuccess": "విజయవంతంగా లాగిన్ అయ్యారు",
+    "registerSuccess": "విజయవంతంగా నమోదు అయ్యారు",
+    "loginError": "లాగిన్ విఫలమైంది",
+    "registerError": "నమోదు విఫలమైంది"
+  },
+  "report": {
+    "title": "సముద్ర హానిని నివేదించండి",
+    "type": "హాని రకం",
+    "location": "స్థానం",
+    "description": "వివరణ",
+    "photo": "ఫోటో",
+    "video": "వీడియో",
+    "submit": "నివేదన సమర్పించు",
+    "submitting": "సమర్పించబడుతోంది...",
+    "success": "నివేదన విజయవంతంగా సమర్పించబడింది",
+    "error": "నివేదన సమర్పించడంలో విఫలమైంది",
+    "types": {
+      "tsunami": "సునామీ",
+      "stormSurge": "తుఫాను తరంగం",
+      "highWaves": "అధిక తరంగాలు",
+      "swellSurge": "సముద్ర తరంగం",
+      "coastalFlooding": "తీర వరద",
+      "abnormalTide": "అసాధారణ సముద్రం",
+      "coastalDamage": "తీర నష్టం",
+      "other": "ఇతర"
+    }
+  },
+  "dashboard": {
+    "title": "హాని డాష్బోర్డ్",
+    "filters": "వడపోతలు",
+    "location": "స్థానం",
+    "eventType": "సంఘటన రకం",
+    "dateRange": "తేదీ పరిధి",
+    "source": "మూలం",
+    "allSources": "అన్ని మూలాలు",
+    "crowdsourced": "సమూహ సహాయం",
+    "socialMedia": "సామాజిక మాధ్యమం",
+    "hotspots": "హాట్‌స్పాట్‌లు",
+    "reports": "నివేదనలు",
+    "verified": "ధృవీకరించబడిన",
+    "pending": "పెండింగ్"
+  },
+  "map": {
+    "loading": "మ్యాప్ లోడ్ అవుతోంది...",
+    "noLocation": "స్థానం అందుబాటులో లేదు",
+    "getLocation": "నా స్థానాన్ని పొందండి"
+  }
+}

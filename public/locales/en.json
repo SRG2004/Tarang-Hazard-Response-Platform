@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "Tarang",
+    "description": "Ocean Hazard Reporting & Monitoring Platform"
+  },
+  "nav": {
+    "home": "Home",
+    "report": "Report",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "header": {
+    "language": "Language",
+    "search": "Search...",
+    "myAccount": "My Account",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "role": "Role",
+    "citizen": "Citizen",
+    "official": "Official",
+    "analyst": "Analyst",
+    "loginSuccess": "Logged in successfully",
+    "registerSuccess": "Registered successfully",
+    "loginError": "Login failed",
+    "registerError": "Registration failed"
+  },
+  "report": {
+    "title": "Report Ocean Hazard",
+    "type": "Hazard Type",
+    "location": "Location",
+    "description": "Description",
+    "photo": "Photo",
+    "video": "Video",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Report submitted successfully",
+    "error": "Failed to submit report",
+    "types": {
+      "tsunami": "Tsunami",
+      "stormSurge": "Storm Surge",
+      "highWaves": "High Waves",
+      "swellSurge": "Swell Surge",
+      "coastalFlooding": "Coastal Flooding",
+      "abnormalTide": "Abnormal Tide",
+      "coastalDamage": "Coastal Damage",
+      "other": "Other"
+    }
+  },
+  "dashboard": {
+    "title": "Hazard Dashboard",
+    "filters": "Filters",
+    "location": "Location",
+    "eventType": "Event Type",
+    "dateRange": "Date Range",
+    "source": "Source",
+    "allSources": "All Sources",
+    "crowdsourced": "Crowdsourced",
+    "socialMedia": "Social Media",
+    "hotspots": "Hotspots",
+    "reports": "Reports",
+    "verified": "Verified",
+    "pending": "Pending"
+  },
+  "map": {
+    "loading": "Loading map...",
+    "noLocation": "Location not available",
+    "getLocation": "Get My Location"
+  }
+}

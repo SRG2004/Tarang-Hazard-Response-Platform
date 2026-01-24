@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+  <meta name="theme-color" content="#0077B6" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tarang" />
+  <link rel="apple-touch-icon" href="/logo192.png" />
+  <meta name="description" content="National Early Warning & Hazard Response Platform" />
+  <title>Tarang - Hazard Response Platform</title>
+
+  <!-- Google Maps with Places API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVoowqjPPR_Oxh2PoBtBiLXblMv12Mg4A&libraries=places,geometry&loading=async&callback=initMap">
+    </script>
+
+  <!-- Google Maps MarkerClusterer for zoom-based clustering -->
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+
+  <script>
+    // Initialize Google Maps callback
+    window.initMap = function () {
+      console.log('Google Maps loaded with Places API and MarkerClusterer');
+    };
+  </script>
+
+  <!-- Google Pay -->
+  <script async src="https://pay.google.com/gp/p/js/pay.js"></script>
+</head>
+
+<body style="background: #f5f5f5;">
+  <div id="root">
+    <div id="loading-indicator" style="padding: 20px; text-align: center; font-family: Arial; color: #333;">
+      <h2>Loading Tarang...</h2>
+      <p id="status">Initializing...</p>
+      <div id="error-display"
+        style="display: none; margin-top: 20px; padding: 15px; background: #ffebee; border-left: 4px solid #f44336; color: #c62828;">
+        <strong>Error:</strong> <span id="error-message"></span>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Simple error handler
+    window.addEventListener('error', function (e) {
+      console.error('Global error:', e.message);
+    });
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

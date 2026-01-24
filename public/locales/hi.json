@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "तरंग",
+    "description": "महासागर खतरे रिपोर्टिंग और निगरानी प्लेटफॉर्म"
+  },
+  "nav": {
+    "home": "घर",
+    "report": "रिपोर्ट",
+    "dashboard": "डैशबोर्ड",
+    "analytics": "विश्लेषण",
+    "login": "लॉग इन",
+    "logout": "लॉग आउट",
+    "profile": "प्रोफ़ाइल"
+  },
+  "auth": {
+    "login": "लॉग इन",
+    "register": "पंजीकरण",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "name": "नाम",
+    "role": "भूमिका",
+    "citizen": "नागरिक",
+    "official": "अधिकारी",
+    "analyst": "विश्लेषक",
+    "loginSuccess": "सफलतापूर्वक लॉग इन",
+    "registerSuccess": "सफलतापूर्वक पंजीकृत",
+    "loginError": "लॉग इन विफल",
+    "registerError": "पंजीकरण विफल"
+  },
+  "report": {
+    "title": "महासागर खतरा रिपोर्ट करें",
+    "type": "खतरे का प्रकार",
+    "location": "स्थान",
+    "description": "विवरण",
+    "photo": "फोटो",
+    "video": "वीडियो",
+    "submit": "रिपोर्ट सबमिट करें",
+    "submitting": "सबमिट हो रहा है...",
+    "success": "रिपोर्ट सफलतापूर्वक सबमिट हुई",
+    "error": "रिपोर्ट सबमिट करने में विफल",
+    "types": {
+      "tsunami": "सुनामी",
+      "stormSurge": "तूफान की लहर",
+      "highWaves": "उच्च लहरें",
+      "swellSurge": "महासागर की लहर",
+      "coastalFlooding": "तटीय बाढ़",
+      "abnormalTide": "असामान्य ज्वार",
+      "coastalDamage": "तटीय क्षति",
+      "other": "अन्य"
+    }
+  },
+  "dashboard": {
+    "title": "खतरा डैशबोर्ड",
+    "filters": "फिल्टर",
+    "location": "स्थान",
+    "eventType": "घटना प्रकार",
+    "dateRange": "तिथि सीमा",
+    "source": "स्रोत",
+    "allSources": "सभी स्रोत",
+    "crowdsourced": "जनसहयोगी",
+    "socialMedia": "सोशल मीडिया",
+    "hotspots": "गर्म क्षेत्र",
+    "reports": "रिपोर्ट",
+    "verified": "सत्यापित",
+    "pending": "लंबित"
+  },
+  "map": {
+    "loading": "मानचित्र लोड हो रहा है...",
+    "noLocation": "स्थान उपलब्ध नहीं",
+    "getLocation": "मेरा स्थान प्राप्त करें"
+  }
+}
