@@ -100,23 +100,7 @@ export function Header({ user, pageTitle, onToggleSidebar, onLogout }: HeaderPro
     }
   };
 
-  const sendTestNotification = async () => {
-    try {
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-      const { db } = await import('../lib/firebase');
 
-      await addDoc(collection(db, 'notifications'), {
-        userId: user.id,
-        title: 'Test Notification',
-        message: 'This is a test notification generated at ' + new Date().toLocaleTimeString(),
-        read: false,
-        createdAt: serverTimestamp(),
-        type: 'info'
-      });
-    } catch (error) {
-      console.error('Error sending test notification:', error);
-    }
-  };
 
   // Format relative time (simple version to avoid large date-fns import if preferred, otherwise import date-fns)
   const formatTimeAgo = (date: Date) => {
@@ -222,12 +206,7 @@ export function Header({ user, pageTitle, onToggleSidebar, onLogout }: HeaderPro
                 <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-slate-700 dark:to-slate-600 border-b border-gray-200 dark:border-slate-600 flex justify-between items-center">
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
                   <div className="flex gap-2">
-                    <button
-                      onClick={sendTestNotification}
-                      className="text-xs text-xs text-blue-600 dark:text-blue-400 hover:underline mr-2"
-                    >
-                      Test
-                    </button>
+
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}

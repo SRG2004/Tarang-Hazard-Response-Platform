@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageContainer, PageHeader } from '../components/ui-redesign/PageLayouts';
 import { DashboardStats } from '../components/feed/DashboardStats';
 import { ActionCard, InfoCard, LoadingState } from '../components/ui-redesign/Cards';
-import { FileText, Users, AlertTriangle, CheckCircle, HandHeart, TrendingUp, Eye, UserCheck, Database } from 'lucide-react';
+import { FileText, Users, AlertTriangle, CheckCircle, HandHeart, TrendingUp, Eye, UserCheck } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
@@ -129,27 +129,7 @@ export function ManagementDashboard() {
           onClick={() => navigate('/data-insights')}
           index={5}
         />
-        <ActionCard
-          title="Seed Database"
-          description="Populate default data"
-          icon={Database}
-          color="#2563EB"
-          onClick={async () => {
-            if (!confirm('This will populate empty collections with default data (Donations, Voluneteers, Drills, Contacts). Continue?')) return;
-            try {
-              const res: any = await apiService.seedDatabase();
-              if (res.success) {
-                toast.success(res.message);
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                toast.error('Seeding failed');
-              }
-            } catch (e) {
-              toast.error('Failed to seed DB');
-            }
-          }}
-          index={6}
-        />
+
       </div>
 
       {/* Recent Activity */}

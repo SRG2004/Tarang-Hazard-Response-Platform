@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageContainer, PageHeader } from '../components/ui-redesign/PageLayouts';
 import { DashboardStats } from '../components/feed/DashboardStats';
 import { ActionCard, InfoCard, LoadingState } from '../components/ui-redesign/Cards';
-import { Users, FileText, Settings, Database, TrendingUp, AlertTriangle, Activity, Package } from 'lucide-react';
+import { Users, FileText, Settings, Database, AlertTriangle, Activity, Package } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
 
@@ -147,108 +147,7 @@ export function AuthorityDashboard() {
         />
 
 
-        {/* TEMP: Seed Data Button */}
-        <div
-          onClick={async () => {
-            const confirm = window.confirm("Add test reports to database?");
-            if (!confirm) return;
 
-            try {
-              const { collection, addDoc, Timestamp } = await import('firebase/firestore');
-              const { db } = await import('../lib/firebase');
-
-              const reports = [
-                {
-                  "analyzedAt": Timestamp.fromDate(new Date("2026-01-23T21:18:35+05:30")),
-                  "autoRejected": false,
-                  "confidenceScore": 0.85,
-                  "createdAt": Timestamp.fromDate(new Date("2026-01-23T10:45:12+05:30")),
-                  "description": "Severe waterlogging reaching 3 feet in residential areas following Cyclone Senyar remnants. Drain overflow reported.",
-                  "latitude": 13.0827,
-                  "location": "13.0827, 80.2707",
-                  "longitude": 80.2707,
-                  "photoURL": "https://cdn.example.com/reports/chennai_flood_01.jpg",
-                  "rejectedAt": null,
-                  "rejectedBy": null,
-                  "rejectionReason": null,
-                  "severity": "high",
-                  "status": "verified",
-                  "submittedAt": Timestamp.fromDate(new Date("2026-01-23T10:40:00+05:30")),
-                  "title": "Chennai Urban Flooding",
-                  "type": "flood",
-                  "updatedAt": Timestamp.fromDate(new Date("2026-01-23T21:18:35+05:30")),
-                  "userId": "uR7x9KJm2AcTjUmVbF41x9zoPLM1",
-                  "verified": true,
-                  "videoURL": ""
-                },
-                {
-                  "analyzedAt": Timestamp.fromDate(new Date("2026-01-23T15:20:10+05:30")),
-                  "autoRejected": false,
-                  "confidenceScore": 0.92,
-                  "createdAt": Timestamp.fromDate(new Date("2025-12-29T08:15:34+05:30")),
-                  "description": "Tap water is appearing yellowish and has a strong chemical odor. Multiple neighbors reporting stomach distress.",
-                  "latitude": 22.7196,
-                  "location": "22.7196, 75.8577",
-                  "longitude": 75.8577,
-                  "photoURL": "https://cdn.example.com/reports/indore_water_quality.jpg",
-                  "rejectedAt": null,
-                  "rejectedBy": null,
-                  "rejectionReason": null,
-                  "severity": "high",
-                  "status": "active",
-                  "submittedAt": Timestamp.fromDate(new Date("2025-12-29T08:10:22+05:30")),
-                  "title": "Water Contamination Alert",
-                  "type": "health_hazard",
-                  "updatedAt": Timestamp.fromDate(new Date("2026-01-23T15:20:10+05:30")),
-                  "userId": "bKPz2HTW4RcTjUmVbF91x1zoKLA5",
-                  "verified": true,
-                  "videoURL": ""
-                },
-                {
-                  "analyzedAt": Timestamp.fromDate(new Date("2026-01-22T19:45:00+05:30")),
-                  "autoRejected": false,
-                  "confidenceScore": 0.98,
-                  "createdAt": Timestamp.fromDate(new Date("2026-01-22T18:30:15+05:30")),
-                  "description": "Massive crowd panic and accident at the railway tracks near Jalgaon. Emergency services needed immediately.",
-                  "latitude": 21.0077,
-                  "location": "21.0077, 75.5626",
-                  "longitude": 75.5626,
-                  "photoURL": "",
-                  "rejectedAt": null,
-                  "rejectedBy": null,
-                  "rejectionReason": null,
-                  "severity": "critical",
-                  "status": "verified",
-                  "submittedAt": Timestamp.fromDate(new Date("2026-01-22T18:25:45+05:30")),
-                  "title": "Railway Track Emergency",
-                  "type": "accident",
-                  "updatedAt": Timestamp.fromDate(new Date("2026-01-22T19:45:00+05:30")),
-                  "userId": "jLQm5NSP1BcTjUmVbF22x8zoXMA9",
-                  "verified": true,
-                  "videoURL": "https://cdn.example.com/reports/jalgaon_accident_clip.mp4"
-                }
-              ];
-
-              const colRef = collection(db, 'reports');
-              for (const report of reports) {
-                await addDoc(colRef, report);
-              }
-              alert('Reports added successfully!');
-            } catch (e) {
-              console.error(e);
-              alert('Failed to add reports');
-            }
-          }}
-          className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col items-center justify-center text-center gap-4 group border-dashed border-2 border-gray-300 dark:border-slate-600"
-        >
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-slate-600 transition-colors">
-            <Database className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Seed Test Data</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Inject test reports</p>
-          </div>
-        </div>
         <ActionCard
           title="Resource Management"
           description="Track inventory & requests"
@@ -281,27 +180,7 @@ export function AuthorityDashboard() {
           onClick={() => navigate('/settings')}
           index={6}
         />
-        <ActionCard
-          title="Seed Database"
-          description="Populate default data"
-          icon={Database}
-          color="#2563EB"
-          onClick={async () => {
-            if (!confirm('This will populate empty collections with default data. Continue?')) return;
-            try {
-              const res: any = await apiService.seedDatabase();
-              if (res.success) {
-                toast.success(res.message);
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                toast.error('Seeding failed');
-              }
-            } catch (e) {
-              toast.error('Failed to seed DB');
-            }
-          }}
-          index={7}
-        />
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
