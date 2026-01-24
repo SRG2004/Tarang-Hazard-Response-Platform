@@ -36,13 +36,16 @@ interface SidebarProps {
   onNavigate: (page: string) => void;
   onLogout: () => void;
   isCollapsed: boolean;
+  isMobile?: boolean;
 }
 
-export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollapsed }: SidebarProps) {
+export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollapsed, isMobile = false }: SidebarProps) {
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(!isMobile);
 
   useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       // Show sidebar when mouse is near left edge (within 50px)
       if (e.clientX < 50) {
@@ -56,7 +59,7 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isCollapsed]);
+  }, [isCollapsed, isMobile]);
 
   // Master list of all possible navigation items
   const allNavItems: Record<string, NavItem> = {
@@ -100,9 +103,9 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
 
   return (
     <>
-      {/* Show indicator when sidebar is hidden */}
+      {/* Show indicator when sidebar is hidden - Desktop Only */}
       <AnimatePresence>
-        {!isVisible && (
+        {!isVisible && !isMobile && (
           <motion.div
             initial={{ x: -10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -116,10 +119,14 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
       </AnimatePresence>
 
       <motion.aside
-        initial={{ x: -280 }}
-        animate={{ x: isVisible ? 0 : -280 }}
+        initial={{ x: isMobile ? 0 : -280 }}
+        animate={{ x: (isVisible || isMobile) ? 0 : -280 }}
         transition={{ duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
-        className="fixed left-0 top-0 h-screen w-[280px] bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-2xl z-50 flex flex-col border-r border-gray-200 dark:border-gray-800"
+        className={cn(
+          "h-screen w-[280px] bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-2xl flex flex-col border-r border-gray-200 dark:border-gray-800",
+          !isMobile && "fixed left-0 top-0 z-50",
+          isMobile && "w-full"
+        )}
       >
         {/* Logo Section */}
         <div className="h-20 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-6">

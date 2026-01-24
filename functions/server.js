@@ -148,9 +148,11 @@ const alertRoutes = require('./routes/alertRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const osintRoutes = require('./routes/osintRoutes');
 const adminRoutes = require('./routes/adminRoutes'); // New
+const exportRoutes = require('./routes/exportRoutes');
 
 app.use('/auth', authRoutes);
 app.use('/admin', verifyAuth, adminRoutes); // Protected seeding
+app.use('/export', verifyAuth, exportRoutes);
 app.use('/alerts', verifyAuth, alertRoutes);
 app.use('/ai', aiRoutes);
 app.use('/osint', verifyAuth, osintRoutes);

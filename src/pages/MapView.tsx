@@ -4,6 +4,7 @@ import { MultiHazardMap } from '../components/map/MultiHazardMap';
 import { Layers, MapPin, Filter, X, Map as MapIcon, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HAZARDS } from '../config/hazards';
+import { HazardType } from '../types';
 
 export function MapView() {
   const [activeLayers, setActiveLayers] = useState({
@@ -19,6 +20,22 @@ export function MapView() {
   const [showLayersDropdown, setShowLayersDropdown] = useState(false);
   const [showSeverityDropdown, setShowSeverityDropdown] = useState(false);
   const [showTypesDropdown, setShowTypesDropdown] = useState(false);
+
+  // Click outside listener
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowLayersDropdown(false);
+        setShowSeverityDropdown(false);
+        setShowTypesDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const severityColors = {
     critical: { bg: '#FEE2E2', border: '#DC2626', text: '#991B1B' },
@@ -87,7 +104,7 @@ export function MapView() {
 
         {/* Horizontal Taskbar with Dropdown Filters */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 shadow-sm">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" ref={dropdownRef}>
             {/* Map Layers Dropdown */}
             <div className="relative">
               <button
@@ -232,7 +249,8 @@ export function MapView() {
                     </button>
                     <div className="border-t border-gray-100 my-1"></div>
                     {hazardTypes.map((type) => {
-                      const hazard = HAZARDS[type];
+                      const hazard = HAZARDS[type as HazardType];
+                      if (!hazard) return null;
                       const Icon = hazard.icon;
                       return (
                         <button
@@ -290,9 +308,13 @@ export function MapView() {
         </div>
 
         {/* Map Container with Border */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 overflow-hidden">
           <div className="h-full w-full bg-white rounded-2xl shadow-lg border-4 border-gray-200 overflow-hidden">
-            <MultiHazardMap />
+            <MultiHazardMap
+              activeLayers={activeLayers}
+              selectedSeverity={selectedSeverity}
+              selectedTypes={selectedTypes}
+            />
           </div>
         </div>
       </div>

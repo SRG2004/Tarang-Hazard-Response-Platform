@@ -19,7 +19,7 @@ export function DataExports() {
 
     setExporting(true);
     try {
-      const blob = await apiService.exportSystemData(dataType, format, dateRange);
+      const blob = await apiService.exportData(dataType as any, format as any, dateRange === 'all' ? undefined : { startDate: dateRange });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

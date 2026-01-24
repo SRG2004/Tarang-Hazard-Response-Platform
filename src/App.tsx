@@ -20,6 +20,7 @@ import { ReportsManagement } from './pages/ReportsManagement';
 import { LiveIntelligence } from './pages/LiveIntelligence';
 import { SocialMediaVerification } from './pages/SocialMediaVerification';
 import { Settings } from './pages/Settings';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VolunteerManagement } from './pages/VolunteerManagement';
 import { VolunteerRegistration } from './pages/VolunteerRegistration';
 import { UserManagement } from './pages/UserManagement';
@@ -228,8 +229,10 @@ function AppContent() {
 
       {/* Mobile Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-[99] w-64 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-r border-border/30 dark:border-gray-700/30 transform transition-transform duration-300 ease-in-out lg:hidden",
-        isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed inset-y-0 left-0 z-[100] w-64 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-r border-border/30 dark:border-gray-700/30 transform transition-all duration-300 ease-in-out lg:hidden",
+        isMobileSidebarOpen
+          ? "translate-x-0 opacity-100 visible"
+          : "-translate-x-full opacity-0 invisible pointer-events-none"
       )}>
         <Sidebar
           userRole={currentUser.role}
@@ -237,16 +240,22 @@ function AppContent() {
           onNavigate={handleNavigate}
           onLogout={handleLogout}
           isCollapsed={false}
+          isMobile={true}
         />
       </div>
 
       {/* Overlay for mobile sidebar */}
-      {isMobileSidebarOpen && (
-        <div
-          className="fixed inset-0 z-[90] bg-black bg-opacity-50 lg:hidden"
-          onClick={toggleSidebar}
-        ></div>
-      )}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden"
+            onClick={toggleSidebar}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">

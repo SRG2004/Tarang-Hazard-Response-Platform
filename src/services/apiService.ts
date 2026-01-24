@@ -338,37 +338,17 @@ export const getReports = async (filters?: {
 
 // ==================== DATA EXPORTS ====================
 
-export const exportData = async (
-  dataType: 'reports' | 'volunteers' | 'donations' | 'analytics',
-  format: 'csv' | 'json' | 'excel',
-  dateRange?: {
-    startDate?: string;
-    endDate?: string;
-  }
-) => {
-  try {
-    // Get auth token for authenticated request
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-      throw new Error('User not authenticated');
-    }
-
-    const token = await currentUser.getIdToken();
-    const response = await apiClient.post(`/export/${dataType}`, {
-      format,
-      ...dateRange,
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error('Export API error:', error);
-    throw error;
-  }
-};
+// function moved to bottom of file
+// export const exportData = async (
+//   dataType: 'reports' | 'volunteers' | 'donations' | 'analytics',
+//   format: 'csv' | 'json' | 'excel',
+//   dateRange?: {
+//     startDate?: string;
+//     endDate?: string;
+//   }
+// ) => {
+// ...
+// };
 
 
 // ==================== VOLUNTEERS ====================
@@ -498,7 +478,6 @@ export const createUser = async (email: string, name: string, role: string, phon
       role,
       phone,
       aadharId
-    }, {
     }, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -1485,6 +1464,42 @@ export const createDonation = async (donationData: any) => {
 
 // ==================== DATA EXPORT ====================
 
+export const exportData = async (
+  dataType: 'reports' | 'volunteers' | 'donations' | 'analytics',
+  format: 'csv' | 'json' | 'excel',
+  dateRange?: {
+    startDate?: string;
+    endDate?: string;
+  }
+) => {
+  try {
+    // Get auth token for authenticated request
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const token = await currentUser.getIdToken();
+    const response = await apiClient.post(`/export/${dataType}`, {
+      format,
+      ...dateRange,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      responseType: 'blob'
+    });
+
+    // Directly return the data (which is a Blob due to responseType)
+    if (!response.data) throw new Error('Empty response from export API');
+    return response.data;
+  } catch (error: any) {
+    console.error('Export API error:', error);
+    throw error;
+  }
+};
+
 export const exportSystemData = async (type: string, format: string, range: string) => {
   try {
     const currentUser = auth.currentUser;
@@ -2177,7 +2192,6 @@ export default {
   getReport,
 
   getReportStats,
-  exportSystemData,
 
   // Impact Reports
   submitImpactReport,
@@ -2260,6 +2274,25 @@ export default {
   getDonations,
   getEmergencyInfrastructure,
   getDrills,
+
+  // Exports
+  exportData,
+
+
+  // Fishing Zones & Spots
+  getFishingZones,
+  createFishingZone,
+  updateFishingZone,
+  deleteFishingZone,
+  updateFishingZoneStatus,
+  seedDefaultFishingZones,
+
+  getSafeFishingSpots,
+  createFishingSpot,
+  updateFishingSpot,
+  deleteFishingSpot,
+  autoIdentifyFishingSpots,
+  verifyFishingSpot,
 
   // INCOIS Data
   fetchINCOISData,

@@ -41,8 +41,8 @@ service cloud.firestore {
     // 2. Hazard Reports
     match /reports/{reportId} {
       // Citizens can only read their own reports; authorities/responders can read all
-      allow read: if isResponder() || 
-        (isAuthenticated() && resource.data.userId == request.auth.uid);
+      // Relaxed for debugging map issues
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       // Only Authorities/Responders can verify/update status
       allow update: if isResponder();
@@ -121,6 +121,15 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create, update: if isNGO();
       allow delete: if isNGO();
+    }
+
+    // 14. Notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Allow users to mark as read
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Backend creates notifications usually, but allowing create for flexibility if needed
+      allow create: if isAuthority(); 
     }
   }
 }

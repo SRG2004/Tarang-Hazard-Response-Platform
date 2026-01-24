@@ -8,20 +8,29 @@ interface MultiHazardMapProps {
     center?: { lat: number; lng: number };
     zoom?: number;
     showAllHazards?: boolean;
+    selectedSeverity?: string[];
+    selectedTypes?: string[];
+    activeLayers?: {
+        hazards: boolean;
+        resources: boolean;
+        satellite: boolean;
+    };
 }
 
 export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
     center = { lat: 20.5937, lng: 78.9629 }, // India Center
     zoom = 5,
-    showAllHazards = true
+    showAllHazards = true,
+    selectedSeverity = ['all'],
+    selectedTypes = ['all'],
+    activeLayers = { hazards: true, resources: true, satellite: false }
 }) => {
     const mapRef = useRef<HTMLDivElement>(null);
-    const googleMapRef = useRef<google.maps.Map | null>(null);
-    const markersRef = useRef<google.maps.Marker[]>([]);
-    const circlesRef = useRef<google.maps.Circle[]>([]);
+    const googleMapRef = useRef<any>(null);
+    const markersRef = useRef<any[]>([]);
+    const circlesRef = useRef<any[]>([]);
     const markerClustererRef = useRef<any>(null); // MarkerClusterer instance
     const [reports, setReports] = useState<HazardReport[]>([]);
-    const [activeLayers, setActiveLayers] = useState<HazardType[]>(Object.keys(HAZARDS) as HazardType[]);
 
     // Load Hazard Reports (VERIFIED ONLY)
     useEffect(() => {
@@ -59,6 +68,8 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
             }
 
             console.log('🗺️ Initializing Google Map');
+
+
 
             const map = new window.google.maps.Map(mapRef.current!, {
                 center,
@@ -108,32 +119,42 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
         markersRef.current = [];
         circlesRef.current = [];
 
-        const newMarkers: google.maps.Marker[] = [];
+        const newMarkers: any[] = [];
+
+        // Update Satellite View
+        if (googleMapRef.current) {
+            googleMapRef.current.setMapTypeId(activeLayers.satellite ? 'satellite' : 'roadmap');
+        }
 
         // Add markers for active hazards
-        reports.forEach(report => {
-            if (!activeLayers.includes(report.type as HazardType)) return;
+        if (activeLayers.hazards) {
+            reports.forEach(report => {
+                // Filter by Type
+                if (!selectedTypes.includes('all') && !selectedTypes.includes(report.type)) return;
 
-            const hazardConfig = HAZARDS[report.type as HazardType];
-            if (!hazardConfig) return;
+                // Filter by Severity
+                if (!selectedSeverity.includes('all') && !selectedSeverity.includes(report.severity)) return;
 
-            // Create marker
-            const marker = new window.google.maps.Marker({
-                position: { lat: report.latitude, lng: report.longitude },
-                title: report.title,
-                icon: {
-                    path: window.google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
-                    fillColor: hazardConfig.color,
-                    fillOpacity: 0.8,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2,
-                }
-            });
+                const hazardConfig = HAZARDS[report.type as HazardType];
+                if (!hazardConfig) return;
 
-            // Create info window
-            const infoWindow = new window.google.maps.InfoWindow({
-                content: `
+                // Create standard legacy marker
+                const marker = new (window as any).google.maps.Marker({
+                    position: { lat: report.latitude, lng: report.longitude },
+                    title: report.title,
+                    icon: {
+                        path: (window as any).google.maps.SymbolPath.CIRCLE,
+                        fillColor: hazardConfig.color,
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2,
+                        scale: 10
+                    }
+                });
+
+                // Create info window
+                const infoWindow = new (window as any).google.maps.InfoWindow({
+                    content: `
                     <div style="padding: 12px; max-width: 300px;">
                         <h3 style="font-weight: bold; font-size: 16px; margin: 0 0 8px 0;">${report.title}</h3>
                         <span style="display: inline-block; padding: 4px 8px; border-radius: 12px; background-color: ${hazardConfig.color}; color: white; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">
@@ -145,61 +166,39 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                         </p>
                     </div>
                 `
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(googleMapRef.current!, marker);
+                });
+
+                newMarkers.push(marker);
+
+                // Create risk radius circle
+                const radius = report.severity === 'critical' ? 5000 : report.severity === 'high' ? 3000 : 1000;
+                const circle = new (window as any).google.maps.Circle({
+                    strokeColor: hazardConfig.color,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: hazardConfig.color,
+                    fillOpacity: 0.2,
+                    map: googleMapRef.current!,
+                    center: { lat: report.latitude, lng: report.longitude },
+                    radius: radius
+                });
+
+                circlesRef.current.push(circle);
             });
-
-            marker.addListener('click', () => {
-                infoWindow.open(googleMapRef.current!, marker);
-            });
-
-            newMarkers.push(marker);
-
-            // Create risk radius circle
-            const radius = report.severity === 'critical' ? 5000 : report.severity === 'high' ? 3000 : 1000;
-            const circle = new window.google.maps.Circle({
-                strokeColor: hazardConfig.color,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: hazardConfig.color,
-                fillOpacity: 0.2,
-                map: googleMapRef.current!,
-                center: { lat: report.latitude, lng: report.longitude },
-                radius: radius
-            });
-
-            circlesRef.current.push(circle);
-        });
+        }
 
         markersRef.current = newMarkers;
 
         // Initialize MarkerClusterer if available
-        if (typeof window.markerClusterer !== 'undefined' && window.markerClusterer.MarkerClusterer) {
-            markerClustererRef.current = new window.markerClusterer.MarkerClusterer({
+        const win = window as any;
+        if (typeof win.markerClusterer !== 'undefined' && win.markerClusterer.MarkerClusterer) {
+            markerClustererRef.current = new win.markerClusterer.MarkerClusterer({
                 map: googleMapRef.current,
-                markers: newMarkers,
-                renderer: {
-                    render: ({ count, position }: any) => {
-                        // Custom cluster styling
-                        const color = count > 10 ? '#DC2626' : count > 5 ? '#F59E0B' : '#4F46E5';
-                        return new window.google.maps.Marker({
-                            position,
-                            icon: {
-                                path: window.google.maps.SymbolPath.CIRCLE,
-                                scale: 15 + (count / 2),
-                                fillColor: color,
-                                fillOpacity: 0.8,
-                                strokeColor: '#ffffff',
-                                strokeWeight: 3,
-                            },
-                            label: {
-                                text: String(count),
-                                color: '#ffffff',
-                                fontSize: '14px',
-                                fontWeight: 'bold'
-                            },
-                            zIndex: Number(window.google.maps.Marker.MAX_ZINDEX) + count,
-                        });
-                    }
-                }
+                markers: newMarkers
             });
         } else {
             // Fallback: add markers directly without clustering
@@ -208,7 +207,7 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
         }
 
         console.log(`📍 Added ${newMarkers.length} markers with clustering`);
-    }, [reports, activeLayers]);
+    }, [reports, activeLayers, selectedSeverity, selectedTypes]);
 
     return (
         <div className="h-full w-full relative z-0">
