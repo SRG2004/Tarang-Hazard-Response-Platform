@@ -78,6 +78,7 @@ export const ROLES_CONFIG: Record<UserRole, RoleConfig> = {
             '/infrastructure',
             '/social-media',
             '/impact-reporting',
+            '/impact-reports',
             '/settings'
         ],
         defaultRoute: '/dashboard',

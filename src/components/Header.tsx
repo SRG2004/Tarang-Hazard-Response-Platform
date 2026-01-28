@@ -40,36 +40,63 @@ export function Header({ user, pageTitle, onToggleSidebar, onLogout }: HeaderPro
   // Notifications logic
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const unsubscribeRef = React.useRef<(() => void) | null>(null);
 
   React.useEffect(() => {
-    if (!user) return;
+    // Cleanup any existing listener first
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
+    if (!user) {
+      // Clear notifications when user logs out
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
 
     // Import Firestore dynamically to avoid initialization errors if not needed immediately
     const setupNotifications = async () => {
-      const { collection, query, where, onSnapshot, orderBy, limit } = await import('firebase/firestore');
-      const { db } = await import('../lib/firebase');
+      try {
+        const { collection, query, where, onSnapshot, orderBy, limit } = await import('firebase/firestore');
+        const { db } = await import('../lib/firebase');
 
-      const q = query(
-        collection(db, 'notifications'),
-        where('userId', '==', user.id),
-        orderBy('createdAt', 'desc'),
-        limit(20)
-      );
+        const q = query(
+          collection(db, 'notifications'),
+          where('userId', '==', user.id),
+          orderBy('createdAt', 'desc'),
+          limit(20)
+        );
 
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const notifs = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate() || new Date()
-        })) as any[];
-        setNotifications(notifs);
-        setUnreadCount(notifs.filter(n => !n.read).length);
-      });
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const notifs = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate() || new Date()
+          })) as any[];
+          setNotifications(notifs);
+          setUnreadCount(notifs.filter(n => !n.read).length);
+        }, (error) => {
+          // Silently handle permission errors (user might have signed out)
+          console.log('Notification listener error (expected on logout):', error.code);
+        });
 
-      return unsubscribe;
+        unsubscribeRef.current = unsubscribe;
+      } catch (error) {
+        console.error('Error setting up notifications:', error);
+      }
     };
 
     setupNotifications();
+
+    // Cleanup function
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
   }, [user]);
 
   const markAsRead = async (notificationId: string) => {

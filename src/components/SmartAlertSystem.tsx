@@ -57,7 +57,10 @@ export const SmartAlertSystem: React.FC = () => {
                 });
             }
         }, (error) => {
-            console.error("Error fetching alerts:", error);
+            // Silently handle permission errors (expected on logout)
+            if (error.code !== 'permission-denied') {
+                console.error("Error fetching alerts:", error);
+            }
         });
 
         return () => unsubscribe();

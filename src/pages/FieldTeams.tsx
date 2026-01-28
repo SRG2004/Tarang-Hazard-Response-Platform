@@ -82,8 +82,11 @@ export function FieldTeams() {
                     setLoading(false);
                 },
                 (error) => {
-                    console.error('Error in teams snapshot:', error);
-                    toast.error('Failed to load teams');
+                    // Silently handle permission errors (expected on logout)
+                    if (error.code !== 'permission-denied') {
+                        console.error('Error in teams snapshot:', error);
+                        toast.error('Failed to load teams');
+                    }
                     setLoading(false);
                 }
             );
@@ -94,7 +97,10 @@ export function FieldTeams() {
                     setDeployments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Deployment)));
                 },
                 (error) => {
-                    console.error('Error in deployments snapshot:', error);
+                    // Silently handle permission errors (expected on logout)
+                    if (error.code !== 'permission-denied') {
+                        console.error('Error in deployments snapshot:', error);
+                    }
                 }
             );
 
