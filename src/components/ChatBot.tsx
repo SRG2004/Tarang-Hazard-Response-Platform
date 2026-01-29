@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sheet, SheetContent } from './ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from './ui/sheet';
 import { MessageCircle, Send, Bot, User, X, Sparkles, AlertCircle, MapPin, Heart, Phone } from 'lucide-react';
 import { cn } from './ui/utils';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -79,7 +79,7 @@ export function ChatBot({ className }: ChatBotProps) {
   }, [messages, isTyping]);
 
   const sendToGemini = async (userMessage: string, history: Message[]): Promise<string> => {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const conversationHistory = history
       .filter(m => m.id !== 'welcome')
       .map(m => `${m.sender === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
@@ -162,6 +162,12 @@ export function ChatBot({ className }: ChatBotProps) {
           side="right"
           className="w-full sm:w-[420px] flex flex-col p-0 h-full border-0 bg-transparent shadow-2xl"
         >
+          {/* Accessibility Title (Hidden) */}
+          <div className="sr-only">
+            <SheetTitle>Tarang AI Assistant</SheetTitle>
+            <SheetDescription>Chat with Tarang AI for disaster management assistance</SheetDescription>
+          </div>
+
           {/* Glassmorphism container */}
           <div className="flex flex-col h-full bg-gradient-to-b from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl">
             {/* Header with gradient */}
