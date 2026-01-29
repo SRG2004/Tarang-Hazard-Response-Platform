@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
-import { PageContainer, PageHeader } from '../components/ui-redesign/PageLayouts';
+import { PageContainer } from '../components/ui-redesign/PageLayouts';
 import { SearchBar } from '../components/ui-redesign/Interactive';
 import { InfoCard, LoadingState, EmptyState } from '../components/ui-redesign/Cards';
-import { Phone, MapPin, Clock, Mail, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Phone, MapPin, Clock, Mail, Plus, Pencil, Trash2, Siren, Flame, Stethoscope, Shield, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -11,7 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import apiService from '../services/apiService';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
+// --- Types ---
 interface Contact {
   id?: string;
   name: string;
@@ -23,17 +26,12 @@ interface Contact {
 }
 
 const CONTACT_CATEGORIES = [
-  { value: 'police', label: 'Police' },
-  { value: 'fire', label: 'Fire Department' },
-  { value: 'ambulance', label: 'Ambulance' },
-  { value: 'hospital', label: 'Hospital' },
-  { value: 'disaster-management', label: 'Disaster Management' },
-  { value: 'coast-guard', label: 'Coast Guard' },
-  { value: 'rescue', label: 'Rescue Services' },
-  { value: 'helpline', label: 'Helpline' },
-  { value: 'ngo', label: 'NGO' },
-  { value: 'government', label: 'Government' },
-  { value: 'other', label: 'Other' }
+  { value: 'police', label: 'Police', icon: Shield, color: 'text-blue-600', bg: 'bg-blue-100' },
+  { value: 'fire', label: 'Fire', icon: Flame, color: 'text-orange-600', bg: 'bg-orange-100' },
+  { value: 'ambulance', label: 'Ambulance', icon: Stethoscope, color: 'text-red-600', bg: 'bg-red-100' },
+  { value: 'disaster', label: 'Disaster Mgmt', icon: Siren, color: 'text-indigo-600', bg: 'bg-indigo-100' },
+  { value: 'hospital', label: 'Hospital', icon: Stethoscope, color: 'text-emerald-600', bg: 'bg-emerald-100' },
+  { value: 'other', label: 'Other Services', icon: Phone, color: 'text-gray-600', bg: 'bg-gray-100' },
 ];
 
 const emptyContact: Contact = {
@@ -42,7 +40,7 @@ const emptyContact: Contact = {
   email: '',
   address: '',
   availability: '24/7',
-  category: 'helpline'
+  category: 'other'
 };
 
 export function EmergencyContacts() {
@@ -78,6 +76,7 @@ export function EmergencyContacts() {
     }
   };
 
+  // --- Handlers ---
   const handleOpenAdd = () => {
     setFormData(emptyContact);
     setIsEditing(false);
@@ -99,11 +98,13 @@ export function EmergencyContacts() {
 
     setSubmitting(true);
     try {
+      // Fallback for role is handled if userProfile is undefined
+      const role = userProfile?.role || 'citizen';
       if (isEditing && formData.id) {
-        await apiService.updateEmergencyContact(formData.id, formData, userProfile?.role || '');
+        await apiService.updateEmergencyContact(formData.id, formData, role);
         toast.success('Contact updated successfully');
       } else {
-        await apiService.createEmergencyContact(formData, userProfile?.role || '');
+        await apiService.createEmergencyContact(formData, role);
         toast.success('Contact created successfully');
       }
 
@@ -118,7 +119,7 @@ export function EmergencyContacts() {
 
   const handleDelete = async (id: string) => {
     try {
-      await apiService.deleteEmergencyContact(id, userProfile?.role || '');
+      await apiService.deleteEmergencyContact(id, userProfile?.role || 'citizen');
       toast.success('Contact deleted successfully');
       setDeleteConfirmId(null);
       fetchContacts();
@@ -132,6 +133,8 @@ export function EmergencyContacts() {
     contact.category?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // --- Render ---
+
   if (loading) {
     return (
       <PageContainer>
@@ -141,103 +144,145 @@ export function EmergencyContacts() {
   }
 
   return (
-    <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <PageHeader
-          title="Emergency Contacts"
-          subtitle="Quick access to emergency services and helplines"
-        />
-        {isAuthority && (
-          <Button onClick={handleOpenAdd} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Add Contact
-          </Button>
-        )}
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20">
+
+      {/* Hero / SOS Section */}
+      <div className="bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-900 dark:to-rose-900 pb-12 pt-8 px-6 rounded-b-[40px] shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Emergency Contacts</h1>
+              <p className="text-red-100">Tap to call instantly in case of emergency.</p>
+            </div>
+            {isAuthority && (
+              <Button onClick={handleOpenAdd} className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-md">
+                <Plus className="w-4 h-4 mr-2" /> Add New
+              </Button>
+            )}
+          </div>
+
+          {/* Quick SOS Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <SOSCard
+              title="Police"
+              number="100"
+              icon={<Shield className="w-8 h-8 text-white" />}
+              bg="bg-blue-600/40"
+            />
+            <SOSCard
+              title="Ambulance"
+              number="102"
+              icon={<Stethoscope className="w-8 h-8 text-white" />}
+              bg="bg-red-500/40"
+            />
+            <SOSCard
+              title="Fire"
+              number="101"
+              icon={<Flame className="w-8 h-8 text-white" />}
+              bg="bg-orange-500/40"
+            />
+            <SOSCard
+              title="Disaster Help"
+              number="108"
+              icon={<Siren className="w-8 h-8 text-white" />}
+              bg="bg-indigo-500/40"
+            />
+          </div>
+        </div>
       </div>
 
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-        placeholder="Search contacts..."
-      />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 -mt-6">
+        {/* Search */}
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 flex items-center gap-4 mb-8">
+          <Search className="w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search hospitals, helplines..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent border-none outline-none flex-1 text-gray-700 dark:text-gray-200 placeholder-gray-400"
+          />
+        </div>
 
-      {filteredContacts.length === 0 ? (
-        <EmptyState
-          icon={Phone}
-          title="No contacts found"
-          description={isAuthority ? "Add your first contact to get started" : "Try adjusting your search"}
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {filteredContacts.map((contact, i) => (
-            <InfoCard
-              key={contact.id || i}
-              title={contact.name || 'Emergency Service'}
-              icon={Phone}
-              iconColor="#EF4444"
-              index={i}
-            >
-              <div className="space-y-2 mt-4">
-                {contact.phone && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    <a href={`tel:${contact.phone}`} className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                      {contact.phone}
-                    </a>
+        {/* Directory Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredContacts.map((contact) => {
+            const cat = CONTACT_CATEGORIES.find(c => c.value === contact.category)
+              || CONTACT_CATEGORIES.find(c => c.value === 'other')!; // Fallback
+            const Icon = cat.icon;
+
+            return (
+              <motion.div
+                key={contact.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ y: -4 }}
+                className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all border border-gray-100 dark:border-slate-700 group"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl ${cat.bg} dark:bg-opacity-10 flex items-center justify-center`}>
+                    <Icon className={`w-6 h-6 ${cat.color}`} />
                   </div>
-                )}
-                {contact.email && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <a href={`mailto:${contact.email}`} className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                      {contact.email}
-                    </a>
-                  </div>
-                )}
-                {contact.address && (
-                  <div className="flex items-start gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
-                    <span className="text-gray-600 dark:text-gray-300">{contact.address}</span>
-                  </div>
-                )}
-                {contact.availability && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600 dark:text-gray-300">{contact.availability}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between mt-3">
-                  {contact.category && (
-                    <span className="inline-block px-2 py-1 text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full capitalize">
-                      {contact.category.replace('-', ' ')}
-                    </span>
-                  )}
-                  {isAuthority && (
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleOpenEdit(contact)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteConfirmId(contact.id || '')}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cat.bg} ${cat.color} bg-opacity-50 dark:bg-opacity-20`}>
+                    {cat.label}
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors">
+                  {contact.name}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  {contact.address || 'No address provided'}
+                </p>
+
+                <div className="space-y-3">
+                  <a href={`tel:${contact.phone}`} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 group-hover:border-blue-200 border border-transparent transition-all">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Call Now</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{contact.phone}</p>
+                    </div>
+                  </a>
+
+                  {contact.email && (
+                    <div className="flex items-center gap-3 px-3">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <a href={`mailto:${contact.email}`} className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 truncate">
+                        {contact.email}
+                      </a>
                     </div>
                   )}
                 </div>
-              </div>
-            </InfoCard>
-          ))}
+
+                {isAuthority && (
+                  <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(contact)}>
+                      <Pencil className="w-4 h-4 text-gray-500" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirmId(contact.id!)}>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
-      )}
+
+        {filteredContacts.length === 0 && (
+          <EmptyState
+            icon={Search}
+            title="No contacts found"
+            description="Try searching for something else."
+          />
+        )}
+      </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -351,6 +396,27 @@ export function EmergencyContacts() {
           </div>
         </DialogContent>
       </Dialog>
-    </PageContainer>
+    </div>
   );
+}
+
+// Subcomponent for SOS Cards
+function SOSCard({ title, number, icon, bg }: { title: string, number: string, icon: React.ReactNode, bg: string }) {
+  return (
+    <motion.a
+      href={`tel:${number}`}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`relative overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 border border-white/10 backdrop-blur-sm cursor-pointer hover:shadow-lg transition-all ${bg}`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
+      <div className="relative z-10 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-1">
+        {icon}
+      </div>
+      <div className="relative z-10">
+        <p className="text-white/80 text-xs font-medium uppercase tracking-wider">{title}</p>
+        <p className="text-white text-2xl font-bold">{number}</p>
+      </div>
+    </motion.a>
+  )
 }

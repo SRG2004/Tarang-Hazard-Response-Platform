@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PageContainer, PageHeader } from '../components/ui-redesign/PageLayouts';
 import { AnimatedInput, AnimatedSelect, AnimatedTextarea, FormSection, ActionButtons } from '../components/ui-redesign/Forms';
-import { UserPlus, Award, Calendar, MapPin, CheckCircle, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { UserPlus, Award, Calendar, MapPin, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -110,14 +110,6 @@ export function VolunteerRegistration() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-12"
                 >
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                        className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4 shadow-xl"
-                    >
-                        <Sparkles className="w-10 h-10 text-white" />
-                    </motion.div>
                     <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
                         Become a Volunteer
                     </h1>
@@ -152,10 +144,10 @@ export function VolunteerRegistration() {
                                 >
                                     <motion.div
                                         className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all ${isActive
-                                                ? `bg-gradient-to-br ${step.color} ring-4 ring-white`
-                                                : isCompleted
-                                                    ? 'bg-gradient-to-br from-green-500 to-emerald-600'
-                                                    : 'bg-white border-2 border-gray-300'
+                                            ? `bg-gradient-to-br ${step.color} ring-4 ring-white`
+                                            : isCompleted
+                                                ? 'bg-gradient-to-br from-green-500 to-emerald-600'
+                                                : 'bg-white border-2 border-gray-300'
                                             }`}
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.95 }}
@@ -268,8 +260,8 @@ export function VolunteerRegistration() {
                                                 whileHover={{ scale: 1.05, y: -2 }}
                                                 whileTap={{ scale: 0.95 }}
                                                 className={`px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${skills.includes(skill.name)
-                                                        ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-transparent shadow-lg'
-                                                        : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300 hover:shadow-md'
+                                                    ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-transparent shadow-lg'
+                                                    : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300 hover:shadow-md'
                                                     }`}
                                             >
                                                 <span className="text-lg mr-2">{skill.icon}</span>
@@ -335,8 +327,8 @@ export function VolunteerRegistration() {
                         whileHover={{ scale: currentStep > 0 ? 1.05 : 1 }}
                         whileTap={{ scale: currentStep > 0 ? 0.95 : 1 }}
                         className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all ${currentStep === 0
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-lg hover:shadow-xl'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-100 shadow-lg hover:shadow-xl'
                             }`}
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -360,8 +352,8 @@ export function VolunteerRegistration() {
                             whileHover={{ scale: !isSubmitting ? 1.05 : 1 }}
                             whileTap={{ scale: !isSubmitting ? 0.95 : 1 }}
                             className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all ${isSubmitting
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white'
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white'
                                 }`}
                         >
                             {isSubmitting ? (

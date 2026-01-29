@@ -306,22 +306,25 @@ html.high-contrast textarea {
     @apply opacity-50 cursor-not-allowed;
   }
 
-  /* Force visible text colors for inputs in all modes */
+  /* Force visible text colors for inputs in all modes - REMOVED to allow overrides */
+  /* 
   input, select, textarea {
-    color: #111827 !important; /* text-gray-900 */
+    color: #111827 !important; 
     background-color: #ffffff !important;
   }
-  
+  */
+
   /* Placeholder specific styling */
   ::placeholder {
-    color: #9ca3af !important; /* text-gray-400 */
-    opacity: 1 !important;
+    color: #9ca3af;
+    /* text-gray-400 */
+    opacity: 1;
   }
-  
+
   /* Select option styling */
   option {
-    color: #111827 !important;
-    background-color: #ffffff !important;
+    color: #111827;
+    background-color: #ffffff;
   }
 
   /* Focus visible for accessibility */

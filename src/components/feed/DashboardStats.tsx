@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Users, TrendingUp, Award } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Award, IndianRupee } from 'lucide-react';
 
 interface StatCardProps {
     title: string;
@@ -65,7 +65,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         {
             title: 'Total Donations',
             value: formatCurrency(totalDonations),
-            icon: <DollarSign className="w-6 h-6" />,
+            icon: <IndianRupee className="w-6 h-6" />,
             color: '#10B981',
             trend: totalDonations > 0 ? '+12% this month' : undefined
         },
