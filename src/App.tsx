@@ -38,6 +38,7 @@ import { FieldVerification } from './pages/FieldVerification';
 import { FieldTeams } from './pages/FieldTeams';
 import { ImpactReporting } from './pages/ImpactReporting';
 import { ImpactReportsList } from './pages/ImpactReportsList';
+import { FieldVerificationsList } from './pages/FieldVerificationsList';
 import { FloatingActionButton } from './components/FloatingActionButton';
 import { SyncStatus } from './components/SyncStatus';
 import { NotificationPermission } from './components/NotificationPermission';
@@ -296,6 +297,7 @@ function AppContent() {
 
             {/* Impact Reporting */}
             <Route path="/impact-reporting" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReporting /></ProtectedRoute>} />
+            <Route path="/field-verifications" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldVerificationsList /></ProtectedRoute>} />
             <Route path="/impact-reports" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReportsList /></ProtectedRoute>} />
 
             {/* MLModelManagement removed */}

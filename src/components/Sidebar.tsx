@@ -84,6 +84,7 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
 
     // Authority Routes
     '/reports': { name: t('nav.reports'), href: 'reports', icon: FileCheck },
+    '/field-verifications': { name: 'Field Verifications', href: 'field-verifications', icon: FileCheck },
 
     '/flash-sms': { name: t('nav.flashSmsAlert'), href: 'flash-sms', icon: AlertCircle },
     '/insights': { name: t('nav.insights'), href: 'insights', icon: BarChart3 },
