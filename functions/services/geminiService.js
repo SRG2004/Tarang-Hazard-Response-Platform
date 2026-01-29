@@ -4,6 +4,37 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 /**
+ * Retry wrapper with exponential backoff for handling 429 errors
+ * @param {Function} fn - Async function to retry
+ * @param {number} maxRetries - Maximum number of retries (default 3)
+ * @param {number} initialDelay - Initial delay in ms (default 1000)
+ * @returns {Promise} Result of the function
+ */
+async function withRetry(fn, maxRetries = 3, initialDelay = 1000) {
+  let lastError;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const isRateLimited = error.message?.includes('429') ||
+        error.message?.includes('Resource exhausted') ||
+        error.message?.includes('Too Many Requests');
+
+      if (!isRateLimited || attempt === maxRetries) {
+        throw error;
+      }
+
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = initialDelay * Math.pow(2, attempt);
+      console.log(`Rate limited, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
+/**
  * Analyze text using Gemini AI to determine if it's related to ocean hazards
  * @param {string} text - The text to analyze
  * @param {string} source - Source of the text (twitter, facebook, youtube, news)
@@ -49,8 +80,10 @@ ${text}
 
 Remember: Respond with ONLY valid JSON, nothing else.`;
 
-    // Generate content
-    const result = await model.generateContent(prompt);
+    // Generate content with retry logic for cold start 429 errors
+    const result = await withRetry(async () => {
+      return await model.generateContent(prompt);
+    });
     const response = await result.response;
     const responseText = response.text();
 
@@ -145,7 +178,10 @@ Respond with ONLY a valid JSON object (no markdown, no code blocks):
 }
 `;
 
-    const result = await model.generateContent(prompt);
+    // Generate content with retry logic for cold start 429 errors
+    const result = await withRetry(async () => {
+      return await model.generateContent(prompt);
+    });
     const response = await result.response;
     const responseText = response.text();
 
@@ -223,7 +259,10 @@ async function analyzeImage(imageBase64, mimeType = 'image/jpeg', textContext = 
     // Text context removed to force visual-only analysis as per user request
     // if (textContext) { ... }
 
-    const result = await model.generateContent(parts);
+    // Generate content with retry logic for cold start 429 errors
+    const result = await withRetry(async () => {
+      return await model.generateContent(parts);
+    });
     const response = await result.response;
     const responseText = response.text();
 
