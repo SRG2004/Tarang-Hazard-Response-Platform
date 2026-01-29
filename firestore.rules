@@ -131,6 +131,14 @@ service cloud.firestore {
       // Backend creates notifications usually, but allowing create for flexibility if needed
       allow create: if isAuthority(); 
     }
+
+    // 15. Field Verifications (responders submit on-ground verification)
+    match /fieldVerifications/{verificationId} {
+      allow read: if isAuthenticated();
+      allow create: if isResponder();
+      allow update: if isAuthority(); // Only authority can approve/reject
+      allow delete: if isAuthority();
+    }
   }
 }
 
