@@ -6,7 +6,9 @@ import { ScrollArea } from './ui/scroll-area';
 import { MessageCircle, Send, Bot, User } from 'lucide-react';
 import { useTranslation } from '../contexts/TranslationContext';
 import { cn } from './ui/utils';
-import { chatWithBot } from '../services/apiService';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 interface Message {
   id: string;
@@ -19,146 +21,72 @@ interface ChatBotProps {
   className?: string;
 }
 
+const SYSTEM_PROMPT = `You are TARANG AI, an intelligent assistant for the Tarang Hazard Response Platform - India's disaster management and ocean hazard monitoring system.
+
+Your role:
+1. Help users navigate the platform (reporting hazards, viewing maps, volunteering, donations)
+2. Provide disaster preparedness and safety information
+3. Answer questions about ocean hazards (tsunamis, cyclones, storm surges)
+4. Guide users on emergency procedures and contacts
+
+Key platform features:
+- Report Hazard: Report disasters with photos, location, AI-assisted analysis
+- Map View: Real-time hazard monitoring across India
+- Field Verification: Responders verify hazards on-ground
+- Volunteer Registration: Citizens register as emergency volunteers
+- Donation Portal: Contribute to relief efforts
+
+Emergency Contacts in India:
+- NDRF: 011-26107953 | INCOIS: 1800-425-7910 | Coast Guard: 1554
+- Fire: 101 | Ambulance: 102 | Police: 100
+
+Be helpful and concise. If user is in emergency, provide emergency contacts immediately.
+Respond in the same language the user uses (English/Hindi). Keep responses under 100 words.`;
+
 export function ChatBot({ className }: ChatBotProps) {
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Initialize with welcome message
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      const welcomeMessage: Message = {
+      setMessages([{
         id: 'welcome',
-        text: t('chatbot.welcome'),
+        text: "🌊 नमस्ते! I'm TARANG AI powered by Gemini.\n\nI can help with:\n• Reporting hazards\n• Emergency contacts\n• Disaster preparedness\n\nHow can I assist you?",
         sender: 'bot',
         timestamp: new Date(),
-      };
-      setMessages([welcomeMessage]);
-    }
-  }, [isOpen, t]);
-
-  // Reset messages when chat closes
-  useEffect(() => {
-    if (!isOpen) {
-      // Clear messages after a short delay to allow animation
-      setTimeout(() => {
-        setMessages([]);
-      }, 300);
+      }]);
     }
   }, [isOpen]);
 
-  // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
+    if (!isOpen) setTimeout(() => setMessages([]), 300);
   }, [isOpen]);
 
-  // Enhanced rule-based chatbot logic with more conversation patterns
-  const getBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase().trim();
+  useEffect(() => {
+    if (isOpen && inputRef.current) setTimeout(() => inputRef.current?.focus(), 100);
+  }, [isOpen]);
 
-    // Greetings - expanded patterns
-    if (lowerMessage.match(/^(hi|hello|hey|hi there|hey there|namaste|namaskar|good morning|good afternoon|good evening|good night|sup|what\'?s up|howdy|नमस्ते|हैलो|नमस्कार|क्या हाल|कैसे हो)$/i)) {
-      return t('chatbot.greeting');
-    }
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages]);
 
-    // Help
-    if (lowerMessage.match(/\b(help|sahayata|madad|what can you do|kya kar sakte ho|मदद|सहायता)\b/i)) {
-      return t('chatbot.help');
-    }
+  const sendToGemini = async (userMessage: string, history: Message[]): Promise<string> => {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const conversationHistory = history
+      .filter(m => m.id !== 'welcome')
+      .map(m => `${m.sender === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
+      .join('\n');
 
-    // Report hazard
-    if (lowerMessage.match(/\b(report|hazard|danger|trouble|sankat|report hazard|report a hazard|how to report|खतरा|रिपोर्ट)\b/i)) {
-      return t('chatbot.reportHazard');
-    }
+    const fullPrompt = `${SYSTEM_PROMPT}\n\n${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}User: ${userMessage}\n\nAssistant:`;
 
-    // Donate
-    if (lowerMessage.match(/\b(donate|donation|contribute|dana|how to donate|दान|योगदान)\b/i)) {
-      return t('chatbot.donate');
-    }
-
-    // Volunteer
-    if (lowerMessage.match(/\b(volunteer|volunteer registration|swayamsevak|register as volunteer|स्वयंसेवक)\b/i)) {
-      return t('chatbot.volunteer');
-    }
-
-    // Map
-    if (lowerMessage.match(/\b(map|location|where|where is|nakshe|location map|नक्शा|मानचित्र)\b/i)) {
-      return t('chatbot.map');
-    }
-
-    // Hazard drills
-    if (lowerMessage.match(/\b(drill|safety drill|hazard drill|abhyas|safety tips|अभ्यास|ड्रिल)\b/i)) {
-      return t('chatbot.hazardDrills');
-    }
-
-    // Emergency contacts
-    if (lowerMessage.match(/\b(emergency|contact|phone|helpline|aatankit|aatank|aatankwadi|aatankwadi contacts|आपातकालीन|संपर्क)\b/i)) {
-      return t('chatbot.emergency');
-    }
-
-    // Login/Register
-    if (lowerMessage.match(/\b(login|register|sign up|sign in|account|login karna|register karna|लॉगिन|पंजीकरण)\b/i)) {
-      return t('chatbot.login');
-    }
-
-    // Weather
-    if (lowerMessage.match(/\b(weather|mausam|forecast|rain|storm|cyclone|मौसम|मौसम पूर्वानुमान)\b/i)) {
-      return t('chatbot.weather');
-    }
-
-    // Safe fishing spots
-    if (lowerMessage.match(/\b(fishing|fisherman|fish|machhli|safe fishing|fishing spots|मछली|मछुआरा)\b/i)) {
-      return t('chatbot.fishing');
-    }
-
-    // What is Tarang/INCOIS
-    if (lowerMessage.match(/\b(what is tarang|what is incois|tarang kya hai|incois kya hai|about|तरंग क्या है|इन्कोइस क्या है)\b/i)) {
-      return t('chatbot.about');
-    }
-
-    // Thank you - expanded patterns
-    if (lowerMessage.match(/\b(thank|thanks|thank you|dhanyavad|shukriya|appreciate|grateful|धन्यवाद|शुक्रिया|बहुत धन्यवाद)\b/i)) {
-      return t('chatbot.thanks');
-    }
-
-    // Goodbye/Farewell
-    if (lowerMessage.match(/\b(bye|goodbye|see you|farewell|take care|alvida|अलविदा|फिर मिलेंगे)\b/i)) {
-      return t('chatbot.goodbye');
-    }
-
-    // Yes/No responses
-    if (lowerMessage.match(/^(yes|yeah|yep|sure|ok|okay|of course|certainly|हाँ|हां|जी हाँ|बिल्कुल)$/i)) {
-      return t('chatbot.positive');
-    }
-
-    if (lowerMessage.match(/^(no|nope|nah|not really|नहीं|जी नहीं)$/i)) {
-      return t('chatbot.negative');
-    }
-
-    // What/How/Where/When questions about features
-    if (lowerMessage.match(/\b(what is|what\'?s|kya hai|क्या है)\b.*\b(tarang|incois|platform|app|application)\b/i)) {
-      return t('chatbot.about');
-    }
-
-    if (lowerMessage.match(/\b(how to|how do|how can|kaise|कैसे)\b.*\b(login|register|sign up|sign in)\b/i)) {
-      return t('chatbot.login');
-    }
-
-    if (lowerMessage.match(/\b(where|kahan|कहाँ|कहां)\b.*\b(fishing|safe|spots|place)\b/i)) {
-      return t('chatbot.fishing');
-    }
-
-    if (lowerMessage.match(/\b(when|kab|कब)\b.*\b(emergency|help|contact)\b/i)) {
-      return t('chatbot.emergency');
-    }
-
-    // Default response
-    return t('chatbot.default');
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    return response.text();
   };
 
   const handleSendMessage = async () => {
@@ -172,35 +100,30 @@ export function ChatBot({ className }: ChatBotProps) {
       timestamp: new Date(),
     };
 
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
     try {
-      // Prepare history for API
-      const history = messages.map(m => ({
-        text: m.text,
-        sender: m.sender
-      }));
-
-      const result = await chatWithBot(messageText, history);
-
-      const botResponse: Message = {
+      const response = await sendToGemini(messageText, messages);
+      setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        text: result.response || t('chatbot.error'),
+        text: response,
         sender: 'bot',
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
-    } catch (error) {
-      const errorResponse: Message = {
+      }]);
+    } catch (error: any) {
+      console.error('Gemini API error:', error);
+      let errorMsg = 'Sorry, I encountered an error. Please try again.';
+      if (error.message?.includes('429')) {
+        errorMsg = 'I\'m receiving too many requests. Please wait a moment and try again.';
+      }
+      setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        text: t('chatbot.error'),
+        text: errorMsg,
         sender: 'bot',
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorResponse]);
+      }]);
     } finally {
       setIsTyping(false);
     }
@@ -213,60 +136,33 @@ export function ChatBot({ className }: ChatBotProps) {
     }
   };
 
-  // Suggested questions - show after welcome or after bot reply
-  const getSuggestedQuestions = () => {
-    const lastMessage = messages[messages.length - 1];
-    const isFirstMessage = messages.length === 1;
-    const isAfterBotReply = lastMessage && lastMessage.sender === 'bot' && messages.length > 1;
-
-    // Show suggestions after welcome message or after bot replies
-    if (isFirstMessage || isAfterBotReply) {
-      return [
-        t('chatbot.suggestions.report'),
-        t('chatbot.suggestions.donate'),
-        t('chatbot.suggestions.volunteer'),
-        t('chatbot.suggestions.map'),
-        t('chatbot.suggestions.emergency'),
-        t('chatbot.suggestions.drills'),
-        t('chatbot.suggestions.fishing'),
-        t('chatbot.suggestions.weather'),
-      ];
-    }
-    return [];
-  };
-
-  const suggestedQuestions = getSuggestedQuestions();
-
   return (
     <>
-      {/* Floating Chat Button */}
       <Button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg bg-[#0077B6] hover:bg-[#005a8c] z-40 flex items-center justify-center",
+          "fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg bg-[#0077B6] hover:bg-[#005a8c] z-40",
           className
         )}
         size="icon"
-        aria-label={t('chatbot.open')}
+        aria-label="Open chat"
       >
         <MessageCircle className="h-6 w-6 text-white" />
       </Button>
 
-      {/* Chat Window */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent side="right" className="w-full sm:w-[400px] flex flex-col p-0 h-full">
           <SheetHeader className="px-4 py-3 border-b flex-shrink-0">
             <div className="flex items-center space-x-2">
               <Bot className="h-5 w-5 text-[#0077B6]" />
-              <SheetTitle>{t('chatbot.title')}</SheetTitle>
+              <SheetTitle>TARANG AI</SheetTitle>
             </div>
             <SheetDescription className="text-xs">
-              {t('chatbot.description')}
+              Powered by Google Gemini
             </SheetDescription>
           </SheetHeader>
 
-          {/* Messages Area */}
-          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -319,50 +215,8 @@ export function ChatBot({ className }: ChatBotProps) {
                 </div>
               )}
             </div>
-
-            {/* Suggested Questions - show after welcome or after bot replies */}
-            {suggestedQuestions.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <p className="text-xs text-muted-foreground font-medium">{t('chatbot.suggestedQuestions')}:</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {suggestedQuestions.map((question, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setInputValue(question);
-                        setTimeout(() => {
-                          const messageText = question;
-                          const userMessage: Message = {
-                            id: Date.now().toString(),
-                            text: messageText,
-                            sender: 'user',
-                            timestamp: new Date(),
-                          };
-                          setMessages((prev) => [...prev, userMessage]);
-                          setIsTyping(true);
-                          setTimeout(async () => {
-                            const botResponse: Message = {
-                              id: (Date.now() + 1).toString(),
-                              text: getBotResponse(messageText),
-                              sender: 'bot',
-                              timestamp: new Date(),
-                            };
-                            setMessages((prev) => [...prev, botResponse]);
-                            setIsTyping(false);
-                          }, 500);
-                        }, 100);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs bg-muted hover:bg-muted/80 hover:bg-[#0077B6]/10 rounded-lg transition-colors border border-border hover:border-[#0077B6] cursor-pointer"
-                    >
-                      {question}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </ScrollArea>
 
-          {/* Input Area */}
           <div className="border-t px-4 py-3 flex-shrink-0">
             <div className="flex space-x-2">
               <Input
@@ -370,7 +224,7 @@ export function ChatBot({ className }: ChatBotProps) {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={t('chatbot.placeholder')}
+                placeholder="Type your message..."
                 className="flex-1"
                 disabled={isTyping}
               />
@@ -384,7 +238,7 @@ export function ChatBot({ className }: ChatBotProps) {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              {t('chatbot.footer')}
+              Powered by Google Gemini AI
             </p>
           </div>
         </SheetContent>
@@ -392,4 +246,3 @@ export function ChatBot({ className }: ChatBotProps) {
     </>
   );
 }
-
