@@ -34,6 +34,15 @@ service firebase.storage {
         request.resource.contentType.matches('image/.*');
     }
     
+    // Field verification photos (responders can upload verification evidence)
+    match /field-verifications/{reportId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        request.resource.size < 10 * 1024 * 1024 &&
+        (request.resource.contentType.matches('image/.*') || 
+         request.resource.contentType.matches('video/.*'));
+    }
+    
     // Hazard report photos (anyone authenticated can upload for reporting)
     match /hazard-photos/{allPaths=**} {
       allow read: if request.auth != null;

@@ -162,7 +162,21 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                         </span>
                         <p style="margin: 8px 0; font-size: 14px; color: #666;">${report.description || 'No description'}</p>
                         <p style="margin: 4px 0; font-size: 12px; color: #999;">
-                            Reported: ${new Date(report.submittedAt).toLocaleDateString()}
+                            Reported: ${(() => {
+                            try {
+                                const ts = report.submittedAt as any;
+                                if (!ts) return 'Unknown';
+                                // Handle Firestore Timestamp
+                                if (typeof ts.toDate === 'function') {
+                                    return ts.toDate().toLocaleDateString();
+                                }
+                                // Handle string or number timestamps
+                                const date = new Date(ts);
+                                return isNaN(date.getTime()) ? 'Unknown' : date.toLocaleDateString();
+                            } catch {
+                                return 'Unknown';
+                            }
+                        })()}
                         </p>
                     </div>
                 `
