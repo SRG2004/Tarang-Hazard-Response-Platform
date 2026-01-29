@@ -141,10 +141,10 @@ export function ManagementDashboard() {
         >
           <div className="space-y-3 mt-4">
             {reports.slice(0, 5).map((report, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-slate-700/50 backdrop-blur-sm rounded-lg border border-white/10">
                 <div>
-                  <p className="font-medium text-sm">{report.title || 'Untitled Report'}</p>
-                  <p className="text-xs text-gray-600">{report.location || 'Unknown location'}</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{report.title || 'Untitled Report'}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{report.location || 'Unknown location'}</p>
                 </div>
                 <span className={`px-2 py-1 text-xs rounded-full ${report.status === 'verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                   }`}>
@@ -162,10 +162,10 @@ export function ManagementDashboard() {
         >
           <div className="space-y-3 mt-4">
             {volunteers.slice(0, 5).map((volunteer, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-slate-700/50 backdrop-blur-sm rounded-lg border border-white/10">
                 <div>
-                  <p className="font-medium text-sm">{volunteer.name || 'Volunteer'}</p>
-                  <p className="text-xs text-gray-600">{volunteer.skills?.join(', ') || 'General'}</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{volunteer.name || 'Volunteer'}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{volunteer.skills?.join(', ') || 'General'}</p>
                 </div>
                 <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
                   Active

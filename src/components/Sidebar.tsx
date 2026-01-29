@@ -124,7 +124,7 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
         animate={{ x: (isVisible || isMobile) ? 0 : -280 }}
         transition={{ duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
         className={cn(
-          "h-screen w-[280px] bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-2xl flex flex-col border-r border-gray-200 dark:border-gray-800",
+          "h-screen w-[280px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-md text-gray-900 dark:text-white shadow-2xl flex flex-col border-r border-gray-200/50 dark:border-gray-800/50",
           !isMobile && "fixed left-0 top-0 z-50",
           isMobile && "w-full"
         )}

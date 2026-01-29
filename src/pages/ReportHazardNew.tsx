@@ -163,7 +163,7 @@ export function ReportHazard() {
     };
 
     return (
-        <AnimatedPage className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-950 p-6">
+        <AnimatedPage className="min-h-screen bg-transparent p-6">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <motion.div
@@ -434,26 +434,26 @@ export function ReportHazard() {
                             >
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-lg">
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Hazard Type</p>
                                             <p className="font-semibold dark:text-white">{HAZARDS[hazardType as HazardType]?.label}</p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-lg">
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Severity</p>
                                             <p className="font-semibold capitalize dark:text-white">{severity}</p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg col-span-2">
+                                        <div className="p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-lg col-span-2">
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Location</p>
                                             <p className="font-semibold dark:text-white">{location || `${latitude}, ${longitude}`}</p>
                                         </div>
                                         {description && (
-                                            <div className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg col-span-2">
+                                            <div className="p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-lg col-span-2">
                                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Description</p>
                                                 <p className="text-sm dark:text-gray-200">{description}</p>
                                             </div>
                                         )}
                                         {(photo || video) && (
-                                            <div className="p-4 bg-gray-50 dark:bg-slate-800 rounded-lg col-span-2">
+                                            <div className="p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-lg col-span-2">
                                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Media</p>
                                                 <div className="flex gap-2 dark:text-white">
                                                     {photo && <span className="text-sm">📷 Photo</span>}

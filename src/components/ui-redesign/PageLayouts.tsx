@@ -14,7 +14,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({ children, classNam
             animate={animations.pageTransition.animate}
             exit={animations.pageTransition.exit}
             transition={animations.pageTransition.transition}
-            className={`min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-950 p-6 transition-colors duration-300 ${className}`}
+            className={`min-h-screen bg-transparent p-6 transition-colors duration-300 ${className}`}
         >
             <div className="max-w-7xl mx-auto">
                 {children}
@@ -60,7 +60,7 @@ interface ContentSectionProps {
 export const ContentSection: React.FC<ContentSectionProps> = ({ children, className = '', delay = 0 }) => {
     return (
         <motion.div
-            className={`bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 ${className}`}
+            className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-white/20 dark:border-slate-700/50 ${className}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay, duration: 0.4 }}

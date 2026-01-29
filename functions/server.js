@@ -145,7 +145,7 @@ app.get('/health', (req, res) => {
 // ==================== ROUTE MOUNTING ====================
 const authRoutes = require('./routes/authRoutes');
 const alertRoutes = require('./routes/alertRoutes');
-const aiRoutes = require('./routes/aiRoutes');
+const aiRoutes = require('./routes/aiContextRoutes');
 const osintRoutes = require('./routes/osintRoutes');
 const adminRoutes = require('./routes/adminRoutes'); // New
 const exportRoutes = require('./routes/exportRoutes');

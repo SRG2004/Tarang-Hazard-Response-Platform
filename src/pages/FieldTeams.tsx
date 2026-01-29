@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PageContainer, PageHeader } from '../components/ui-redesign/PageLayouts';
 import { InfoCard, LoadingState } from '../components/ui-redesign/Cards';
-import { Users, Truck, Clock, MapPin, Plus, CheckCircle } from 'lucide-react';
+import { Users, Truck, Clock, Plus, CheckCircle } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
@@ -55,7 +55,7 @@ export function FieldTeams() {
     // Forms
     const [showCreateTeam, setShowCreateTeam] = useState(false);
     const [showDeployModal, setShowDeployModal] = useState(false);
-    const [selectedTeam, setSelectedTeam] = useState<string>('');
+    // const [selectedTeam, setSelectedTeam] = useState<string>('');
 
     const [newTeam, setNewTeam] = useState({
         name: '',
@@ -202,19 +202,19 @@ export function FieldTeams() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <InfoCard
                     title={teams.length.toString()}
-                    subtitle="Total Teams"
+                    description="Total Teams"
                     icon={Users}
                     iconColor="#4F46E5"
                 />
                 <InfoCard
                     title={teams.filter(t => t.status === 'deployed').length.toString()}
-                    subtitle="Currently Deployed"
+                    description="Currently Deployed"
                     icon={Truck}
                     iconColor="#F59E0B"
                 />
                 <InfoCard
                     title={deployments.filter(d => d.status === 'completed').length.toString()}
-                    subtitle="Missions Completed"
+                    description="Missions Completed"
                     icon={CheckCircle}
                     iconColor="#10B981"
                 />
@@ -251,8 +251,8 @@ export function FieldTeams() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {teams.map(team => (
-                            <div key={team.id} className="bg-white p-6 rounded-lg shadow-md border-l-4"
-                                style={{ borderColor: team.status === 'deployed' ? '#F59E0B' : '#10B981' }}>
+                            <div key={team.id} className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/20 dark:border-slate-700/50 border-l-4"
+                                style={{ borderLeftColor: team.status === 'deployed' ? '#F59E0B' : '#10B981' }}>
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h4 className="font-bold text-lg">{team.name}</h4>
@@ -293,7 +293,7 @@ export function FieldTeams() {
                         const report = activeReports.find(r => r.id === deployment.targetReportId);
 
                         return (
-                            <div key={deployment.id} className="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
+                            <div key={deployment.id} className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/20 dark:border-slate-700/50 flex justify-between items-center">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-indigo-100 rounded-full">
                                         <Truck className="w-6 h-6 text-indigo-600" />

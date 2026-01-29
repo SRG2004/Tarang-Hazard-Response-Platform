@@ -144,7 +144,7 @@ export function EmergencyContacts() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20">
+    <div className="min-h-screen bg-transparent pb-20">
 
       {/* Hero / SOS Section */}
       <div className="bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-900 dark:to-rose-900 pb-12 pt-8 px-6 rounded-b-[40px] shadow-2xl relative overflow-hidden">

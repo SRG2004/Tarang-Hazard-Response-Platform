@@ -100,9 +100,9 @@ export function LiveIntelligence() {
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className={`flex items - center gap - 2 px - 4 py - 2 bg - indigo - 600 text - white rounded - lg hover: bg - indigo - 700 transition - colors ${refreshing ? 'opacity-75 cursor-not-allowed' : ''} `}
+          className={`flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ${refreshing ? 'opacity-75 cursor-not-allowed' : ''}`}
         >
-          <RefreshCw className={`w - 4 h - 4 ${refreshing ? 'animate-spin' : ''} `} />
+          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           {refreshing ? 'Scanning...' : 'Refresh Analysis'}
         </button>
       </div>
@@ -131,10 +131,10 @@ export function LiveIntelligence() {
                 <button
                   key={platform}
                   onClick={() => setFilterPlatform(platform)}
-                  className={`px - 4 py - 2 rounded - full text - sm font - medium whitespace - nowrap transition - colors ${filterPlatform === platform
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterPlatform === platform
                     ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700 border'
                     : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
-                    } `}
+                    }`}
                 >
                   {platform === 'all' ? 'All Sources' :
                     platform === 'gnews' ? 'Google News' :
@@ -173,8 +173,8 @@ export function LiveIntelligence() {
 
                     {/* AI Analysis Search Badge */}
                     <div className="flex flex-wrap gap-2">
-                      <span className={`inline - flex items - center px - 2 py - 1 rounded text - xs font - medium ${alert.aiAnalysis?.isHazard ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                        } `}>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${alert.aiAnalysis?.isHazard ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
                         {alert.aiAnalysis?.hazardType || 'Potential Hazard'}
                       </span>
                       <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
@@ -214,7 +214,7 @@ export function LiveIntelligence() {
         <div className="space-y-6 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Source Distribution */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-6 rounded-2xl shadow-md border border-white/20 dark:border-slate-700/50">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Intelligence Sources</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -229,8 +229,8 @@ export function LiveIntelligence() {
                       paddingAngle={5}
                       dataKey="value"
                     >
-                      {sourceData.map((entry, index) => (
-                        <Cell key={`cell - ${index} `} fill={COLORS[index % COLORS.length]} />
+                      {sourceData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <RechartsTooltip />
@@ -248,7 +248,7 @@ export function LiveIntelligence() {
             </div>
 
             {/* Hazard Distribution */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-6 rounded-2xl shadow-md border border-white/20 dark:border-slate-700/50">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detected Hazards</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">

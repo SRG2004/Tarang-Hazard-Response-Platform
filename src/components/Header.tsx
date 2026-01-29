@@ -151,7 +151,7 @@ export function Header({ user, pageTitle, onToggleSidebar, onLogout }: HeaderPro
       initial={{ y: -64 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3 }}
-      className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between sticky top-0 z-40 transition-all duration-300"
+      className="h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-gray-100/50 dark:border-slate-800/50 flex items-center justify-between sticky top-0 z-40 transition-all duration-300"
     >
       {/* Subtle top indicator bar */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"></div>

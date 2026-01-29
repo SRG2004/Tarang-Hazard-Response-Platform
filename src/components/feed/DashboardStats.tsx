@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Users, TrendingUp, Award, IndianRupee } from 'lucide-react';
+import { Users, TrendingUp, Award, IndianRupee } from 'lucide-react';
 
 interface StatCardProps {
     title: string;
@@ -14,7 +14,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, trend, index }) => {
     return (
         <motion.div
-            className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 hover:shadow-xl transition-shadow"
+            className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl shadow-md p-6 hover:shadow-xl transition-shadow border border-white/20 dark:border-slate-700/50"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.4 }}

@@ -204,7 +204,7 @@ export function ResourceManagement() {
                         </div>
                     )}
 
-                    <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 min-h-[300px]">
+                    <div className="bg-white/40 dark:bg-slate-800/20 p-4 rounded-xl border border-white/20 dark:border-slate-700/50 min-h-[300px]">
                         <ResourceRequestList
                             userId={currentUser?.uid || ''}
                             userRole={userProfile?.role || 'ngo'}
@@ -226,7 +226,7 @@ export function ResourceManagement() {
 
                     {/* Add Resource Form */}
                     {showAddForm && (
-                        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-6">
+                        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-xl p-8 mb-8 border border-white/20 dark:border-slate-700/50">
                             <h3 className="text-lg font-bold mb-4 dark:text-white">Add New Resource</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -332,9 +332,9 @@ export function ResourceManagement() {
                             return (
                                 <div
                                     key={resource.id || index}
-                                    className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border-l-4"
+                                    className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-xl shadow-md p-6 border border-white/20 dark:border-slate-700/50 border-l-4"
                                     style={{
-                                        borderColor: resource.status === 'available' ? '#10B981' :
+                                        borderLeftColor: resource.status === 'available' ? '#10B981' :
                                             resource.status === 'allocated' ? '#F59E0B' : '#EF4444'
                                     }}
                                 >

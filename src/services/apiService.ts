@@ -798,8 +798,33 @@ export const getMonitoringStatus = async () => {
     return {
       success: false,
       error: error.response?.data?.error || error.message || 'Failed to fetch monitoring status',
-      status: 'idle'
+      monitoring: null,
+      history: []
     };
+  }
+};
+
+// ==================== AI CHATBOT (RAG) ====================
+
+export const sendChatMessage = async (message: string, history: any[]) => {
+  try {
+    const currentUser = auth.currentUser;
+    // Chat can be public, but if logged in, we send token for rate limiting (future)
+    const headers: any = {};
+    if (currentUser) {
+      const token = await currentUser.getIdToken();
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await apiClient.post('/ai/chat', {
+      message,
+      history
+    }, { headers });
+
+    return response.data.response;
+  } catch (error: any) {
+    console.error('Error sending chat message:', error);
+    throw new Error(error.response?.data?.response || 'Failed to connect to AI');
   }
 };
 
@@ -1336,7 +1361,7 @@ export const getSafeFishingSpots = async () => {
   }
 };
 
-export const createFishingSpot = async (spotData: any, userRole: string) => {
+export const createFishingSpot = async (spotData: any) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -1357,7 +1382,7 @@ export const createFishingSpot = async (spotData: any, userRole: string) => {
   }
 };
 
-export const updateFishingSpot = async (id: string, spotData: any, userRole: string) => {
+export const updateFishingSpot = async (id: string, spotData: any) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -1378,7 +1403,7 @@ export const updateFishingSpot = async (id: string, spotData: any, userRole: str
   }
 };
 
-export const deleteFishingSpot = async (id: string, userRole: string) => {
+export const deleteFishingSpot = async (id: string) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -1651,7 +1676,7 @@ export const createCircular = async (circularData: {
   priority: 'high' | 'medium' | 'low';
   issuedDate?: string;
   expiryDate?: string;
-}, userRole: string) => {
+}, _userRole: string) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -1679,7 +1704,7 @@ export const updateCircular = async (id: string, circularData: {
   priority?: 'high' | 'medium' | 'low';
   issuedDate?: string;
   expiryDate?: string;
-}, userRole: string) => {
+}, _userRole: string) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -1700,7 +1725,7 @@ export const updateCircular = async (id: string, circularData: {
   }
 };
 
-export const deleteCircular = async (id: string, userRole: string) => {
+export const deleteCircular = async (id: string, _userRole: string) => {
   try {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -2221,13 +2246,16 @@ export default {
   // Dashboard
   getDashboardAnalytics,
 
-  // Social Media
+  // Social Media & OSINT
   processSocialMediaPosts,
   monitorSocialMedia,
   getSocialMediaReports,
   getMonitoringStatus,
   testSocialMediaServices,
   verifySocialMediaPost,
+  getOsintAlerts,
+  triggerOsintScan,
+  getOsintAnalytics,
 
   // Notifications
   sendEmailNotification,

@@ -40,7 +40,7 @@ function RecentCriticalReports() {
   return (
     <>
       {alerts.map(alert => (
-        <div key={alert.id} className={`p-3 rounded-lg border ${alert.severity === 'critical' ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/50' : 'bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900/50'}`}>
+        <div key={alert.id} className={`p-3 rounded-lg border ${alert.severity === 'critical' ? 'bg-red-500/10 dark:bg-red-900/20 backdrop-blur-sm border-red-500/20 dark:border-red-500/30' : 'bg-orange-500/10 dark:bg-orange-900/20 backdrop-blur-sm border-orange-500/20 dark:border-orange-500/30'}`}>
           <p className={`text-sm font-medium ${alert.severity === 'critical' ? 'text-red-800 dark:text-red-300' : 'text-orange-800 dark:text-orange-300'}`}>
             {alert.type?.toUpperCase()} - {alert.location?.split(',')[0]}
           </p>

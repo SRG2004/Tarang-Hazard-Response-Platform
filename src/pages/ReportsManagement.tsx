@@ -447,7 +447,7 @@ export function ReportsManagement() {
                         <span>View AI Analysis Details</span>
                       </summary>
 
-                      <div className="mt-2 p-3 bg-purple-50 dark:bg-purple-900/10 border border-purple-100 dark:border-purple-800 rounded space-y-2">
+                      <div className="mt-2 p-3 bg-purple-50/50 dark:bg-purple-900/10 backdrop-blur-sm border border-purple-100 dark:border-purple-800 rounded-xl space-y-2">
                         {/* Image Analysis */}
                         {report.aiAnalysis.imageAnalysis && (
                           <div className="text-xs">
@@ -498,7 +498,7 @@ export function ReportsManagement() {
 
                   {/* Contextual Intelligence Display */}
                   {report.contextualData && (
-                    <div className="mt-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="mt-3 p-4 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 backdrop-blur-md border border-blue-200 dark:border-blue-800 rounded-xl">
                       <h4 className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
                         🔍 Contextual Verification
                         <span className="ml-auto text-xs font-semibold px-2 py-1 bg-blue-600 text-white rounded-full">
@@ -508,7 +508,7 @@ export function ReportsManagement() {
 
                       {/* Weather Info */}
                       {report.contextualData.weather && (
-                        <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded border border-blue-100 dark:border-blue-900">
+                        <div className="mb-3 p-2 bg-white/40 dark:bg-slate-800/20 backdrop-blur-sm rounded-lg border border-blue-100 dark:border-blue-900">
                           <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">🌤️ Weather Conditions:</p>
                           <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                             <p>
@@ -531,7 +531,7 @@ export function ReportsManagement() {
 
                       {/* Historical Matches */}
                       {report.contextualData.historicalMatches?.length > 0 && (
-                        <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded border border-blue-100 dark:border-blue-900">
+                        <div className="mb-3 p-2 bg-white/40 dark:bg-slate-800/20 backdrop-blur-sm rounded-lg border border-blue-100 dark:border-blue-900">
                           <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                             📊 Similar Past Events: {report.contextualData.historicalMatches.length} found
                           </p>
@@ -547,13 +547,13 @@ export function ReportsManagement() {
 
                       {/* Trusted News Articles */}
                       {report.contextualData.socialMediaEvidence?.newsArticles?.length > 0 && (
-                        <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded border border-blue-100 dark:border-blue-900">
+                        <div className="mb-3 p-2 bg-white/40 dark:bg-slate-800/20 backdrop-blur-sm rounded-lg border border-blue-100 dark:border-blue-900">
                           <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             📰 News Coverage: {report.contextualData.socialMediaEvidence.newsArticles.length} articles
                           </p>
                           <div className="space-y-2">
                             {report.contextualData.socialMediaEvidence.newsArticles.slice(0, 2).map((article: any, idx: number) => (
-                              <div key={idx} className="p-2 bg-gray-50 dark:bg-slate-700 rounded">
+                              <div key={idx} className="p-2 bg-white/30 dark:bg-slate-700/30 rounded-lg">
                                 <a
                                   href={article.url}
                                   target="_blank"
@@ -577,13 +577,13 @@ export function ReportsManagement() {
 
                       {/* Viral Social Posts */}
                       {report.contextualData.socialMediaEvidence?.viralPosts?.length > 0 && (
-                        <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded border border-blue-100 dark:border-blue-900">
+                        <div className="mb-3 p-2 bg-white/40 dark:bg-slate-800/20 backdrop-blur-sm rounded-lg border border-blue-100 dark:border-blue-900">
                           <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             🔥 Viral Posts: {report.contextualData.socialMediaEvidence.viralPosts.length} found
                           </p>
                           <div className="space-y-2">
                             {report.contextualData.socialMediaEvidence.viralPosts.slice(0, 2).map((post: any, idx: number) => (
-                              <div key={idx} className="p-2 bg-gray-50 dark:bg-slate-700 rounded">
+                              <div key={idx} className="p-2 bg-white/30 dark:bg-slate-700/30 rounded-lg">
                                 <p className="text-xs text-gray-600 dark:text-gray-300">{post.content}</p>
                                 <div className="flex items-center gap-2 mt-1">
                                   <span className="text-xs text-gray-400">via {post.platform}</span>
@@ -602,7 +602,7 @@ export function ReportsManagement() {
 
                       {/* YouTube Videos */}
                       {report.contextualData.socialMediaEvidence?.youtubeVideos?.length > 0 && (
-                        <div className="p-2 bg-white dark:bg-slate-800 rounded border border-blue-100 dark:border-blue-900">
+                        <div className="p-2 bg-white/40 dark:bg-slate-800/20 backdrop-blur-sm rounded-lg border border-blue-100 dark:border-blue-900">
                           <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             🎥 YouTube: {report.contextualData.socialMediaEvidence.youtubeVideos.length} videos
                           </p>

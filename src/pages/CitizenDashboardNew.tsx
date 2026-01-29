@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
@@ -8,6 +9,7 @@ import { DashboardStats } from '../components/feed/DashboardStats';
 import { Loader2, Filter, ChevronDown, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { HAZARDS } from '../config/hazards';
+import { PageContainer } from '../components/ui-redesign/PageLayouts';
 
 export function CitizenDashboardNew() {
     const { currentUser } = useAuth();
@@ -63,7 +65,8 @@ export function CitizenDashboardNew() {
             return false;
         }
         if (selectedStatuses.length > 0) {
-            if (selectedStatuses.includes('verified') && !report.verified) return false;
+            // Fix: Check status field instead of non-existent verified boolean
+            if (selectedStatuses.includes('verified') && report.status !== 'verified') return false;
             if (selectedStatuses.includes('pending') && report.status !== 'pending') return false;
             if (selectedStatuses.includes('solved') && report.status !== 'solved') return false;
         }
@@ -112,7 +115,7 @@ export function CitizenDashboardNew() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-950 p-6">
+        <PageContainer>
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <motion.div
@@ -134,7 +137,7 @@ export function CitizenDashboardNew() {
                 />
 
                 {/* Filters Toolbar */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4 mb-6">
+                <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-md border border-white/20 dark:border-slate-700/50 p-4 mb-6">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-3">
                             {/* Hazard Type Dropdown */}
@@ -322,6 +325,6 @@ export function CitizenDashboardNew() {
                     </div>
                 )}
             </div>
-        </div>
+        </PageContainer>
     );
 }

@@ -25,7 +25,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
 }) => {
     return (
         <motion.div
-            className={`bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 ${onClick ? 'cursor-pointer hover:shadow-xl' : ''} transition-shadow ${className}`}
+            className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl shadow-md p-6 ${onClick ? 'cursor-pointer hover:shadow-xl' : ''} transition-shadow border border-white/20 dark:border-slate-700/50 ${className}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.4 }}
@@ -67,7 +67,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     return (
         <motion.button
             onClick={onClick}
-            className="w-full bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 text-left hover:shadow-xl transition-all"
+            className="w-full bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl shadow-md p-6 text-left hover:shadow-xl transition-all border border-white/20 dark:border-slate-700/50"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1, duration: 0.3 }}

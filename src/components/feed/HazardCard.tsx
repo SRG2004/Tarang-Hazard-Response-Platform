@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, User, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { MapPin, Calendar, User, CheckCircle, Clock } from 'lucide-react';
 import { HazardReport } from '../../types';
 import { HAZARDS } from '../../config/hazards';
 
@@ -14,7 +14,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
     const hazardConfig = HAZARDS[report.type];
 
     const getStatusBadge = () => {
-        if (report.verified) {
+        if (report.status === 'verified' || report.verifiedBy) {
             return (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                     <CheckCircle className="w-3 h-3" />
@@ -22,7 +22,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
                 </span>
             );
         }
-        if (report.status === 'resolved') {
+        if (report.status === 'solved') {
             return (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
                     <CheckCircle className="w-3 h-3" />
@@ -42,7 +42,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
         switch (report.severity) {
             case 'critical': return 'bg-red-100 text-red-700 border-red-200';
             case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
-            case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+            case 'moderate': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
             case 'low': return 'bg-green-100 text-green-700 border-green-200';
             default: return 'bg-gray-100 text-gray-700 border-gray-200';
         }
@@ -50,7 +50,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
 
     // Get status-based card styling
     const getStatusStyling = () => {
-        if (report.verified || report.verifiedBy) {
+        if (report.status === 'verified' || report.verifiedBy) {
             return {
                 borderColor: '#10B981', // Green for verified
                 bgClass: 'bg-green-50/30'
@@ -78,7 +78,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
             transition={{ delay: index * 0.1, duration: 0.4 }}
             whileHover={{ y: -4, scale: 1.02 }}
             onClick={onClick}
-            className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden border-l-4 ${statusStyle.bgClass}`}
+            className={`bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden border border-white/20 dark:border-slate-700/50 border-l-4 ${statusStyle.bgClass}`}
             style={{ borderLeftColor: statusStyle.borderColor }}
         >
             {/* Header with colored bar */}
@@ -128,7 +128,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
                         </span>
                     </div>
 
-                    {report.userId && (
+                    {report.submittedBy && (
                         <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-gray-400" />
                             <span>Reported by citizen</span>
@@ -137,13 +137,13 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
                 </div>
 
                 {/* Photo Preview */}
-                {report.photoURL && (
+                {report.imageUrl && (
                     <motion.div
                         className="mt-4 rounded-lg overflow-hidden"
                         whileHover={{ scale: 1.02 }}
                     >
                         <img
-                            src={report.photoURL}
+                            src={report.imageUrl}
                             alt={report.title}
                             className="w-full h-48 object-cover"
                         />

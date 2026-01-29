@@ -102,7 +102,7 @@ export function VolunteerRegistration() {
     const currentStepData = steps[currentStep];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
+        <div className="min-h-screen bg-transparent py-12 px-4">
             <div className="max-w-4xl mx-auto">
                 {/* Animated Header */}
                 <motion.div

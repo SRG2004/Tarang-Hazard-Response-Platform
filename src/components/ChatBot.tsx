@@ -2,10 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from './ui/sheet';
 import { MessageCircle, Send, Bot, User, X, Sparkles, AlertCircle, MapPin, Heart, Phone } from 'lucide-react';
 import { cn } from './ui/utils';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+import { sendChatMessage } from '../services/apiService';
 
 interface Message {
   id: string;
@@ -17,28 +14,6 @@ interface Message {
 interface ChatBotProps {
   className?: string;
 }
-
-const SYSTEM_PROMPT = `You are TARANG AI, an intelligent assistant for the Tarang Hazard Response Platform - India's disaster management and ocean hazard monitoring system.
-
-Your role:
-1. Help users navigate the platform (reporting hazards, viewing maps, volunteering, donations)
-2. Provide disaster preparedness and safety information
-3. Answer questions about ocean hazards (tsunamis, cyclones, storm surges)
-4. Guide users on emergency procedures and contacts
-
-Key platform features:
-- Report Hazard: Report disasters with photos, location, AI-assisted analysis
-- Map View: Real-time hazard monitoring across India
-- Field Verification: Responders verify hazards on-ground
-- Volunteer Registration: Citizens register as emergency volunteers
-- Donation Portal: Contribute to relief efforts
-
-Emergency Contacts in India:
-- NDRF: 011-26107953 | INCOIS: 1800-425-7910 | Coast Guard: 1554
-- Fire: 101 | Ambulance: 102 | Police: 100
-
-Be helpful and concise. If user is in emergency, provide emergency contacts immediately.
-Respond in the same language the user uses (English/Hindi). Keep responses under 100 words.`;
 
 const quickActions = [
   { icon: AlertCircle, label: 'Report Hazard', prompt: 'How do I report a hazard?' },
@@ -59,15 +34,11 @@ export function ChatBot({ className }: ChatBotProps) {
     if (isOpen && messages.length === 0) {
       setMessages([{
         id: 'welcome',
-        text: "🌊 नमस्ते! I'm TARANG AI, your disaster management assistant.\n\nHow can I help you today?",
+        text: "🌊 नमस्ते! I'm TARANG AI, your disaster management assistant.\n\nI have access to real-time hazard reports. How can I help you today?",
         sender: 'bot',
         timestamp: new Date(),
       }]);
     }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) setTimeout(() => setMessages([]), 300);
   }, [isOpen]);
 
   useEffect(() => {
@@ -77,20 +48,6 @@ export function ChatBot({ className }: ChatBotProps) {
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, isTyping]);
-
-  const sendToGemini = async (userMessage: string, history: Message[]): Promise<string> => {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const conversationHistory = history
-      .filter(m => m.id !== 'welcome')
-      .map(m => `${m.sender === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
-      .join('\n');
-
-    const fullPrompt = `${SYSTEM_PROMPT}\n\n${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}User: ${userMessage}\n\nAssistant:`;
-
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    return response.text();
-  };
 
   const handleSendMessage = async (messageText?: string) => {
     const text = (messageText || inputValue).trim();
@@ -108,22 +65,27 @@ export function ChatBot({ className }: ChatBotProps) {
     setIsTyping(true);
 
     try {
-      const response = await sendToGemini(text, messages);
+      // Filter history to send only relevant fields to backend
+      const historyToSend = messages
+        .filter(m => m.id !== 'welcome')
+        .map(m => ({
+          text: m.text,
+          sender: m.sender
+        }));
+
+      const responseText = await sendChatMessage(text, historyToSend);
+
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        text: response,
+        text: responseText,
         sender: 'bot',
         timestamp: new Date(),
       }]);
     } catch (error: any) {
-      console.error('Gemini API error:', error);
-      let errorMsg = 'Sorry, I encountered an error. Please try again.';
-      if (error.message?.includes('429')) {
-        errorMsg = 'I\'m receiving too many requests. Please wait a moment.';
-      }
+      console.error('Chat error:', error);
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        text: errorMsg,
+        text: error.message || "I'm having trouble connecting to the server. Please try again.",
         sender: 'bot',
         timestamp: new Date(),
       }]);
@@ -184,10 +146,10 @@ export function ChatBot({ className }: ChatBotProps) {
                   </div>
                   <div>
                     <h2 className="font-bold text-white text-lg flex items-center gap-2">
-                      TARANG AI
+                      TARANG AI V2
                       <Sparkles className="h-4 w-4 text-yellow-300" />
                     </h2>
-                    <p className="text-xs text-cyan-100">Powered by Gemini</p>
+                    <p className="text-xs text-cyan-100 italic">Server-Side RAG • Real-Time Data</p>
                   </div>
                 </div>
                 <button
@@ -255,6 +217,7 @@ export function ChatBot({ className }: ChatBotProps) {
                       <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                     </div>
                   </div>
+                  <div className="text-xs text-slate-500 animate-pulse self-center ml-2">Searching database...</div>
                 </div>
               )}
 
@@ -301,7 +264,7 @@ export function ChatBot({ className }: ChatBotProps) {
                 </button>
               </div>
               <p className="text-[10px] text-slate-500 text-center mt-2">
-                ✨ Powered by Google Gemini AI
+                ✨ Powered by Tarang RAG Intelligence
               </p>
             </div>
           </div>
