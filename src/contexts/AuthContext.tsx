@@ -988,11 +988,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else {
           // Debounce logout to prevent flicker if this is a transient state
           // (e.g. Firebase initializing or token refresh)
-          const logoutDelay = 2000;
+          // With sessionStorage persistence, we can use a shorter delay
+          const logoutDelay = 300;
           setTimeout(() => {
             // Check if we are still logged out after the delay
             if (!auth.currentUser) {
               console.log('Confirmed logout state after delay');
+              sessionStorage.removeItem('tarang_auth_active');
               userProfileRef.current = null;
               setUserProfile(null);
               setCurrentUser(null);
