@@ -12,8 +12,10 @@ import {
 } from 'recharts';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function LiveIntelligence() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('feed');
   const [alerts, setAlerts] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
@@ -46,14 +48,14 @@ export function LiveIntelligence() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    toast.info('Scanning live sources... This may take a moment.');
+    toast.info(t('intelligence.scanning'));
     try {
       const result = await apiService.triggerOsintScan();
       if (result.success) {
-        toast.success(`Scan complete. Found ${result.stats?.saved || 0} new reports.`);
+        toast.success(t('intelligence.scanComplete', { count: result.stats?.saved || 0 }));
         fetchData(); // Reload data
       } else {
-        toast.error('Scan failed to complete');
+        toast.error(t('intelligence.scanFailed'));
       }
     } catch (error) {
       toast.error('Error triggering scan');
@@ -94,8 +96,8 @@ export function LiveIntelligence() {
     <PageContainer>
       <div className="flex justify-between items-start mb-6">
         <PageHeader
-          title="Disaster Intelligence"
-          subtitle="Real-time OSINT analysis from trusted global sources"
+          title={t('intelligence.title')}
+          subtitle={t('intelligence.subtitle')}
         />
         <button
           onClick={handleRefresh}

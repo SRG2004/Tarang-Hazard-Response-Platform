@@ -517,6 +517,41 @@ const translations: Record<string, Record<string, string>> = {
     'nav.socialMediaFeed': 'Social Media Feed',
     'nav.dataExports': 'Data Exports',
     'nav.systemSettings': 'System Settings',
+    'nav.socialMedia': 'Social Media',
+    'nav.socialMediaVerification': 'Social Verification',
+    'nav.resourceManagement': 'Resource Management',
+    'nav.fieldTeams': 'Field Teams',
+    'nav.impactReporting': 'Impact Reporting',
+    'nav.impactReports': 'Impact Reports',
+    'nav.emergencyDispatch': 'Emergency Dispatch',
+    'nav.fieldVerification': 'Field Verification',
+    'nav.fieldVerifications': 'Field Verifications',
+
+    // Login Demo
+    'login.demoAccess': 'Demo Access',
+    'login.demoDescription': 'Quickly explore the platform using these pre-configured role accounts.',
+    'login.clickToFill': 'Click to fill',
+
+    // Live Intelligence
+    'intelligence.title': 'Disaster Intelligence',
+    'intelligence.subtitle': 'Real-time OSINT analysis from trusted global sources',
+    'intelligence.scanning': 'Scanning live sources... This may take a moment.',
+    'intelligence.scanComplete': 'Scan complete. Found {{count}} new reports.',
+    'intelligence.scanFailed': 'Scan failed to complete',
+    'intelligence.noData': 'No intelligence data available',
+    'intelligence.tabFeed': 'Live Feed',
+    'intelligence.tabAnalytics': 'Analytics',
+
+    // Emergency Infrastructure
+    'infrastructure.title': 'Emergency Infrastructure',
+    'infrastructure.subtitle': 'Critical facilities and emergency response centers',
+    'infrastructure.allFacilities': 'All Facilities',
+    'infrastructure.hospitals': 'Hospitals',
+    'infrastructure.shelters': 'Shelters',
+    'infrastructure.fireStations': 'Fire Stations',
+    'infrastructure.policeStations': 'Police Stations',
+    'infrastructure.noFacilities': 'No facilities found',
+    'infrastructure.adjustFilters': 'Try adjusting your search or filters',
 
     // Map View
     'map.title': 'Hazard Map',
@@ -1093,6 +1128,41 @@ const translations: Record<string, Record<string, string>> = {
     'nav.socialMediaFeed': 'सोशल मीडिया फ़ीड',
     'nav.dataExports': 'डेटा निर्यात',
     'nav.systemSettings': 'सिस्टम सेटिंग्स',
+    'nav.socialMedia': 'सोशल मीडिया',
+    'nav.socialMediaVerification': 'सोशल मीडिया सत्यापन',
+    'nav.resourceManagement': 'संसाधन प्रबंधन',
+    'nav.fieldTeams': 'फिल्ड टीमें',
+    'nav.impactReporting': 'प्रभाव रिपोर्टिंग',
+    'nav.impactReports': 'प्रभाव रिपोर्टें',
+    'nav.emergencyDispatch': 'आपातकालीन डिस्पैच',
+    'nav.fieldVerification': 'फिल्ड सत्यापन',
+    'nav.fieldVerifications': 'फिल्ड सत्यापन',
+
+    // Login Demo
+    'login.demoAccess': 'डमो एक्सेस',
+    'login.demoDescription': 'इन पूर्व-कॉन्फ़िगर किए गए भूमिका खातों का उपयोग करके प्लेटफ़ॉर्म का त्वरित अन्वेषण करें।',
+    'login.clickToFill': 'भरने के लिए क्लिक करें',
+
+    // Live Intelligence
+    'intelligence.title': 'आपदा खुफिया',
+    'intelligence.subtitle': 'विश्वसनीय वैश्विक स्रोतों से रीयल-टाइम OSINT विश्लेषण',
+    'intelligence.scanning': 'लाइव स्रोतों को स्कैन किया जा रहा है... इसमें कुछ समय लग सकता है।',
+    'intelligence.scanComplete': 'स्कैन पूरा हुआ। {{count}} नई रिपोर्टें मिलीं।',
+    'intelligence.scanFailed': 'स्कैन पूरा करने में विफल',
+    'intelligence.noData': 'कोई खुफिया डेटा उपलब्ध नहीं है',
+    'intelligence.tabFeed': 'लाइव फ़ीड',
+    'intelligence.tabAnalytics': 'एनालिटिक्स',
+
+    // Emergency Infrastructure
+    'infrastructure.title': 'आपातकालीन बुनियादी ढांचा',
+    'infrastructure.subtitle': 'महत्वपूर्ण सुविधाएं और आपातकालीन प्रतिक्रिया केंद्र',
+    'infrastructure.allFacilities': 'सभी सुविधाएं',
+    'infrastructure.hospitals': 'अस्पताल',
+    'infrastructure.shelters': 'आश्रय',
+    'infrastructure.fireStations': 'फायर स्टेशन',
+    'infrastructure.policeStations': 'पुलिस स्टेशन',
+    'infrastructure.noFacilities': 'कोई सुविधा नहीं मिली',
+    'infrastructure.adjustFilters': 'अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें',
 
     // Dashboard additional keys
     'dashboard.markAsSolved': 'हल के रूप में चिह्नित करें',

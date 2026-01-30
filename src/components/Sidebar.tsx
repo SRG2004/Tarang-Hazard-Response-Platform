@@ -74,27 +74,27 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
     '/volunteer-registration': { name: t('nav.volunteerRegistration'), href: 'volunteer-registration', icon: UserPlus },
 
     // NGO Routes
-    '/resource-management': { name: 'Resource Management', href: 'resource-management', icon: Package },
-    '/field-teams': { name: 'Field Teams', href: 'field-teams', icon: Users },
-    '/impact-reporting': { name: 'Impact Reporting', href: 'impact-reporting', icon: FileText },
-    '/impact-reports': { name: 'Impact Reports', href: 'impact-reports', icon: BarChart3 },
+    '/resource-management': { name: t('nav.resourceManagement'), href: 'resource-management', icon: Package },
+    '/field-teams': { name: t('nav.fieldTeams'), href: 'field-teams', icon: Users },
+    '/impact-reporting': { name: t('nav.impactReporting'), href: 'impact-reporting', icon: FileText },
+    '/impact-reports': { name: t('nav.impactReports'), href: 'impact-reports', icon: BarChart3 },
 
     // Responder Routes  
-    '/emergency-dispatch': { name: 'Emergency Dispatch', href: 'emergency-dispatch', icon: AlertCircle },
-    '/field-verification': { name: 'Field Verification', href: 'field-verification', icon: FileCheck },
+    '/emergency-dispatch': { name: t('nav.emergencyDispatch'), href: 'emergency-dispatch', icon: AlertCircle },
+    '/field-verification': { name: t('nav.fieldVerification'), href: 'field-verification', icon: FileCheck },
 
     // Authority Routes
     '/reports': { name: t('nav.reports'), href: 'reports', icon: FileCheck },
-    '/field-verifications': { name: 'Field Verifications', href: 'field-verifications', icon: FileCheck },
+    '/field-verifications': { name: t('nav.fieldVerifications'), href: 'field-verifications', icon: FileCheck },
 
     '/flash-sms': { name: t('nav.flashSmsAlert'), href: 'flash-sms', icon: AlertCircle },
     '/insights': { name: t('nav.insights'), href: 'insights', icon: BarChart3 },
     '/volunteers': { name: t('nav.volunteers'), href: 'volunteers', icon: Users },
     '/user-management': { name: t('nav.userManagement'), href: 'user-management', icon: UserCog },
-    '/data-exports': { name: 'Data Exports', href: 'data-exports', icon: Package },
+    '/data-exports': { name: t('nav.dataExports'), href: 'data-exports', icon: Package },
     '/settings': { name: t('header.settings'), href: 'settings', icon: Settings },
-    '/social-media': { name: 'Social Media', href: 'social-media', icon: Activity },
-    '/social-media-verification': { name: 'Social Verification', href: 'social-media-verification', icon: CheckCircle },
+    '/social-media': { name: t('nav.socialMedia'), href: 'social-media', icon: Activity },
+    '/social-media-verification': { name: t('nav.socialMediaVerification'), href: 'social-media-verification', icon: CheckCircle },
   };
 
   // Compute navItems based on role

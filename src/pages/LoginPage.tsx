@@ -234,30 +234,30 @@ export function LoginPage() {
                   {/* Right Column: Demo Access */}
                   <div className="space-y-4 md:border-l md:border-gray-200 md:dark:border-gray-700 md:pl-8 flex flex-col justify-center">
                     <div className="mb-2 text-center md:text-left">
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">Demo Access</h3>
+                      <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">{t('login.demoAccess')}</h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                        Quickly explore the platform using these pre-configured role accounts.
+                        {t('login.demoDescription')}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { role: 'citizen', label: 'Citizen', password: 'citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
-                        { role: 'authority', label: 'Authority', password: 'authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
-                        { role: 'responder', label: 'Responder', password: 'responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
-                        { role: 'ngo', label: 'NGO', password: 'ngo123', color: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200' }
+                        { role: 'citizen', password: 'citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
+                        { role: 'authority', password: 'authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
+                        { role: 'responder', password: 'responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
+                        { role: 'ngo', password: 'ngo123', color: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200' }
                       ].map((item) => (
                         <button
                           key={item.role}
                           onClick={() => {
                             setLoginEmail(`${item.role}@gmail.com`);
                             setLoginPassword(item.password);
-                            toast.info(`Filled ${item.label} credentials`);
+                            toast.info(t('login.fillAllFields')); // Or a better message like "Credentials filled"
                           }}
                           className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] ${item.color}`}
                         >
-                          <span className="font-semibold text-sm">{item.label}</span>
-                          <span className="text-[10px] opacity-70 mt-1">Click to fill</span>
+                          <span className="font-semibold text-sm">{t(`role.${item.role}`)}</span>
+                          <span className="text-[10px] opacity-70 mt-1">{t('login.clickToFill')}</span>
                         </button>
                       ))}
                     </div>

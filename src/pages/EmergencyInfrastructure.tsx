@@ -5,8 +5,10 @@ import { InfoCard, LoadingState, EmptyState } from '../components/ui-redesign/Ca
 import { Building2, MapPin, Phone, Clock } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function EmergencyInfrastructure() {
+    const { t } = useTranslation();
     const [facilities, setFacilities] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -31,11 +33,11 @@ export function EmergencyInfrastructure() {
     }, []);
 
     const tabs = [
-        { id: 'all', label: 'All Facilities' },
-        { id: 'hospital', label: 'Hospitals' },
-        { id: 'shelter', label: 'Shelters' },
-        { id: 'firestation', label: 'Fire Stations' },
-        { id: 'police', label: 'Police Stations' }
+        { id: 'all', label: t('infrastructure.allFacilities') },
+        { id: 'hospital', label: t('infrastructure.hospitals') },
+        { id: 'shelter', label: t('infrastructure.shelters') },
+        { id: 'firestation', label: t('infrastructure.fireStations') },
+        { id: 'police', label: t('infrastructure.policeStations') }
     ];
 
     const filteredFacilities = facilities.filter(facility => {
@@ -56,14 +58,14 @@ export function EmergencyInfrastructure() {
     return (
         <PageContainer>
             <PageHeader
-                title="Emergency Infrastructure"
-                subtitle="Critical facilities and emergency response centers"
+                title={t('infrastructure.title')}
+                subtitle={t('infrastructure.subtitle')}
             />
 
             <SearchBar
                 value={search}
                 onChange={setSearch}
-                placeholder="Search facilities..."
+                placeholder={t('common.search')}
             />
 
             <div className="mt-6">
@@ -77,8 +79,8 @@ export function EmergencyInfrastructure() {
             {filteredFacilities.length === 0 ? (
                 <EmptyState
                     icon={Building2}
-                    title="No facilities found"
-                    description="Try adjusting your search or filters"
+                    title={t('infrastructure.noFacilities')}
+                    description={t('infrastructure.adjustFilters')}
                 />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
