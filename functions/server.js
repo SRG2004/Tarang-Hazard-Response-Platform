@@ -456,8 +456,8 @@ async function performReportAnalysis(report, reportId) {
       }
     }
 
-    // 2. Text Analysis
-    if (report.description && (!aiAnalysis.imageAnalysis || !aiAnalysis.imageAnalysis.isHazard)) {
+    // 2. Text Analysis - Always analyze text (not just when no image)
+    if (report.description) {
       try {
         console.log('Analyzing report text...');
         const textAnalysis = await geminiService.analyzeHazardContext(
@@ -471,6 +471,9 @@ async function performReportAnalysis(report, reportId) {
         aiAnalysis.textError = txtError.message;
       }
     }
+
+    // Track if image was provided for confidence capping
+    aiAnalysis.hasImage = !!report.photoURL;
 
     // 3. Calculate Overall Confidence Score
     const overallConfidence = calculateOverallConfidence(aiAnalysis);
@@ -528,12 +531,14 @@ async function performReportAnalysis(report, reportId) {
 
 /**
  * Calculate weighted overall confidence score
+ * When no image is attached, confidence is capped at 50% max
  */
 function calculateOverallConfidence(aiAnalysis) {
   const scores = [];
+  const hasImage = aiAnalysis.hasImage === true;
 
   // Image analysis (weighted 60% if available)
-  if (aiAnalysis.imageAnalysis?.confidence !== undefined) {
+  if (hasImage && aiAnalysis.imageAnalysis?.confidence !== undefined) {
     // Only count the score if it IS a hazard. If isHazard is false, score is 0.
     const imageScore = aiAnalysis.imageAnalysis.isHazard ? aiAnalysis.imageAnalysis.confidence : 0;
 
@@ -549,11 +554,11 @@ function calculateOverallConfidence(aiAnalysis) {
     }
   }
 
-  // Text analysis (weighted 40% if available)
+  // Text analysis (weighted 40% normally, 100% if no image)
   if (aiAnalysis.textAnalysis?.confidence !== undefined) {
     scores.push({
       score: aiAnalysis.textAnalysis.confidence,
-      weight: 0.4
+      weight: hasImage ? 0.4 : 1.0 // Full weight to text if no image
     });
   }
 
@@ -565,8 +570,16 @@ function calculateOverallConfidence(aiAnalysis) {
   // Calculate weighted average
   const totalWeight = scores.reduce((sum, s) => sum + s.weight, 0);
   const weightedSum = scores.reduce((sum, s) => sum + (s.score * s.weight), 0);
+  let confidence = weightedSum / totalWeight;
 
-  return weightedSum / totalWeight;
+  // Cap confidence at 50% if no image was provided
+  // This ensures no-image reports always require manual review
+  if (!hasImage) {
+    confidence = Math.min(confidence, 0.5);
+    console.log(`No image attached - capping confidence at 50%: ${confidence}`);
+  }
+
+  return confidence;
 }
 
 // ==================== VOLUNTEERS ====================

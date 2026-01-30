@@ -95,8 +95,8 @@ exports.analyzeReport = functions.firestore
         }
       }
 
-      // 2. Text Analysis
-      if (report.description && (!aiAnalysis.imageAnalysis || !aiAnalysis.imageAnalysis.isHazard)) {
+      // 2. Text Analysis - Always analyze text (not just when no image)
+      if (report.description) {
         try {
           console.log('Analyzing report text...');
           const textAnalysis = await geminiService.analyzeHazardContext(
@@ -110,6 +110,9 @@ exports.analyzeReport = functions.firestore
           aiAnalysis.textError = txtError.message;
         }
       }
+
+      // Track if image was provided for confidence capping
+      aiAnalysis.hasImage = !!report.photoURL;
 
       // 3. Calculate Overall Confidence Score
       const overallConfidence = calculateOverallConfidence(aiAnalysis);
@@ -163,21 +166,34 @@ exports.analyzeReport = functions.firestore
     }
   });
 
-/* Helper function for the trigger */
+/* Helper function for the trigger - caps confidence at 50% for no-image reports */
 function calculateOverallConfidence(aiAnalysis) {
   const scores = [];
-  if (aiAnalysis.imageAnalysis?.confidence !== undefined) {
+  const hasImage = aiAnalysis.hasImage === true;
+
+  if (hasImage && aiAnalysis.imageAnalysis?.confidence !== undefined) {
     const imageScore = aiAnalysis.imageAnalysis.isHazard ? aiAnalysis.imageAnalysis.confidence : 0;
     scores.push({ score: imageScore, weight: 0.6 });
     if (aiAnalysis.imageAnalysis.isAiGenerated && aiAnalysis.imageAnalysis.aiGenConfidence > 0.7) return 0;
   }
+
   if (aiAnalysis.textAnalysis?.confidence !== undefined) {
-    scores.push({ score: aiAnalysis.textAnalysis.confidence, weight: 0.4 });
+    scores.push({ score: aiAnalysis.textAnalysis.confidence, weight: hasImage ? 0.4 : 1.0 });
   }
+
   if (scores.length === 0) return 0.3;
+
   const totalWeight = scores.reduce((sum, s) => sum + s.weight, 0);
   const weightedSum = scores.reduce((sum, s) => sum + (s.score * s.weight), 0);
-  return weightedSum / totalWeight;
+  let confidence = weightedSum / totalWeight;
+
+  // Cap confidence at 50% for no-image reports
+  if (!hasImage) {
+    confidence = Math.min(confidence, 0.5);
+    console.log(`No image attached - capping confidence at 50%: ${confidence}`);
+  }
+
+  return confidence;
 }
 
 // Google Sheets Integration - Sync donations
