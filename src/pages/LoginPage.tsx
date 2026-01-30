@@ -242,16 +242,16 @@ export function LoginPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { role: 'citizen', label: 'Citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
-                        { role: 'authority', label: 'Authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
-                        { role: 'responder', label: 'Responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
-                        { role: 'ngo', label: 'NGO', color: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200' }
+                        { role: 'citizen', label: 'Citizen', password: 'citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
+                        { role: 'authority', label: 'Authority', password: 'authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
+                        { role: 'responder', label: 'Responder', password: 'responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
+                        { role: 'ngo', label: 'NGO', password: 'ngo123', color: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200' }
                       ].map((item) => (
                         <button
                           key={item.role}
                           onClick={() => {
                             setLoginEmail(`${item.role}@gmail.com`);
-                            setLoginPassword('password');
+                            setLoginPassword(item.password);
                             toast.info(`Filled ${item.label} credentials`);
                           }}
                           className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] ${item.color}`}
