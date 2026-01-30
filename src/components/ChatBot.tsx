@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from './ui/sheet';
-import { MessageCircle, Send, Bot, User, X, Sparkles, AlertCircle, MapPin, Heart, Phone } from 'lucide-react';
+import { MessageCircle, Send, Bot, User, X, Sparkles } from 'lucide-react';
 import { cn } from './ui/utils';
 import { sendChatMessage } from '../services/apiService';
 
@@ -15,12 +15,7 @@ interface ChatBotProps {
   className?: string;
 }
 
-const quickActions = [
-  { icon: AlertCircle, label: 'Report Hazard', prompt: 'How do I report a hazard?' },
-  { icon: Phone, label: 'Emergency', prompt: 'What are the emergency contact numbers?' },
-  { icon: MapPin, label: 'View Map', prompt: 'How can I view the hazard map?' },
-  { icon: Heart, label: 'Volunteer', prompt: 'How can I register as a volunteer?' },
-];
+
 
 export function ChatBot({ className }: ChatBotProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -221,26 +216,7 @@ export function ChatBot({ className }: ChatBotProps) {
                 </div>
               )}
 
-              {/* Quick Actions - show after welcome */}
-              {messages.length === 1 && !isTyping && (
-                <div className="pt-2 space-y-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
-                  <p className="text-xs text-slate-400 font-medium px-1">Quick Actions</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {quickActions.map((action, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSendMessage(action.prompt)}
-                        className="flex items-center gap-2 px-3 py-2.5 bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 hover:border-cyan-500/50 rounded-xl text-left transition-all duration-200 group"
-                      >
-                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center group-hover:from-cyan-500/30 group-hover:to-blue-600/30 transition-colors">
-                          <action.icon className="h-4 w-4 text-cyan-400" />
-                        </div>
-                        <span className="text-xs font-medium text-slate-200">{action.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+
             </div>
 
             {/* Input Area */}

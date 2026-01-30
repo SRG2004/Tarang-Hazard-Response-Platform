@@ -227,6 +227,30 @@ export function LoginPage() {
                   >
                     <Chrome className="w-5 h-5" /> {t('login.signInWithGoogle')}
                   </motion.button>
+
+                  <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-center text-gray-500 mb-3 uppercase tracking-wider font-semibold">Demo Access</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { role: 'citizen', label: 'Citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
+                        { role: 'authority', label: 'Authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
+                        { role: 'responder', label: 'Responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
+                        { role: 'ngo', label: 'NGO', color: 'bg-green-50 text-green-700 hover:bg-green-100' }
+                      ].map((item) => (
+                        <button
+                          key={item.role}
+                          onClick={() => {
+                            setLoginEmail(`${item.role}@gmail.com`);
+                            setLoginPassword('password');
+                            toast.info(`Filled ${item.label} credentials`);
+                          }}
+                          className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${item.color}`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
@@ -337,7 +361,7 @@ export function LoginPage() {
           </motion.div>
 
         </div>
-      </motion.div>
-    </div>
+      </motion.div >
+    </div >
   );
 }
