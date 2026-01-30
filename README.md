@@ -97,11 +97,4 @@ npm run deploy
 
 This command builds the frontend (`npm run build`) and deploys hosting, functions, and rules to your Firebase project.
 
-## 📱 Mobile App (Android)
 
-To build and run the Android app using Capacitor:
-
-```bash
-npm run android:build
-npx cap open android
-```
