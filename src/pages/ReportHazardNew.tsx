@@ -156,7 +156,11 @@ export function ReportHazard() {
             case 1: return hazardType !== '';
             case 2: return severity !== '';
             case 3: return (latitude !== '' && longitude !== '') || location !== '';
-            case 4: return description.trim().length >= 10; // Require at least 10 characters
+            case 4:
+                // Allow proceeding with EITHER a description (10+ chars) OR media (photo/video)
+                const hasDescription = description.trim().length >= 10;
+                const hasMedia = photo !== null || video !== null;
+                return hasDescription || hasMedia;
             case 5: return true;
             default: return false;
         }
