@@ -311,7 +311,7 @@ function AppContent() {
               <Route path="/field-teams" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldTeams /></ProtectedRoute>} />
               <Route path="/impact-reporting" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReporting /></ProtectedRoute>} />
               <Route path="/impact-reports-list" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReportsList /></ProtectedRoute>} />
-              <Route path="/field-verifications-list" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldVerificationsList /></ProtectedRoute>} />
+              <Route path="/field-verifications" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldVerificationsList /></ProtectedRoute>} />
 
               {/* Fallback */}
               <Route path="*" element={
