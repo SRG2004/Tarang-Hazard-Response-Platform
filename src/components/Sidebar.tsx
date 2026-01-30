@@ -92,6 +92,8 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
     '/user-management': { name: t('nav.userManagement'), href: 'user-management', icon: UserCog },
     '/data-exports': { name: 'Data Exports', href: 'data-exports', icon: Package },
     '/settings': { name: t('header.settings'), href: 'settings', icon: Settings },
+    '/social-media': { name: 'Social Media', href: 'social-media', icon: Activity },
+    '/social-media-verification': { name: 'Social Verification', href: 'social-media-verification', icon: CheckCircle },
   };
 
   // Compute navItems based on role

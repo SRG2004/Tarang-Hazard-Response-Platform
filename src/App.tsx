@@ -297,20 +297,22 @@ function AppContent() {
               <Route path="/data-exports" element={<ProtectedRoute user={currentUser} loading={authLoading}><DataExports /></ProtectedRoute>} />
 
               <Route path="/social-media-verification" element={<ProtectedRoute user={currentUser} loading={authLoading}><SocialMediaVerification /></ProtectedRoute>} />
+              <Route path="/social-media" element={<ProtectedRoute user={currentUser} loading={authLoading}><LiveIntelligence /></ProtectedRoute>} />
 
               <Route path="/hazard-drills" element={<ProtectedRoute user={currentUser} loading={authLoading}><HazardDrills /></ProtectedRoute>} />
               <Route path="/emergency-contacts" element={<ProtectedRoute user={currentUser} loading={authLoading}><EmergencyContacts /></ProtectedRoute>} />
+              <Route path="/infrastructure" element={<ProtectedRoute user={currentUser} loading={authLoading}><EmergencyInfrastructure /></ProtectedRoute>} />
               <Route path="/flash-sms" element={<ProtectedRoute user={currentUser} loading={authLoading}><FlashSMSAlert /></ProtectedRoute>} />
 
               <Route path="/settings" element={<ProtectedRoute user={currentUser} loading={authLoading}><Settings /></ProtectedRoute>} />
 
               <Route path="/donate" element={<ProtectedRoute user={currentUser} loading={authLoading}><Donation /></ProtectedRoute>} />
-              <Route path="/resources" element={<ProtectedRoute user={currentUser} loading={authLoading}><ResourceManagement /></ProtectedRoute>} />
+              <Route path="/resource-management" element={<ProtectedRoute user={currentUser} loading={authLoading}><ResourceManagement /></ProtectedRoute>} />
               <Route path="/emergency-dispatch" element={<ProtectedRoute user={currentUser} loading={authLoading}><EmergencyDispatch /></ProtectedRoute>} />
               <Route path="/field-verification" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldVerification /></ProtectedRoute>} />
               <Route path="/field-teams" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldTeams /></ProtectedRoute>} />
               <Route path="/impact-reporting" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReporting /></ProtectedRoute>} />
-              <Route path="/impact-reports-list" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReportsList /></ProtectedRoute>} />
+              <Route path="/impact-reports" element={<ProtectedRoute user={currentUser} loading={authLoading}><ImpactReportsList /></ProtectedRoute>} />
               <Route path="/field-verifications" element={<ProtectedRoute user={currentUser} loading={authLoading}><FieldVerificationsList /></ProtectedRoute>} />
 
               {/* Fallback */}
