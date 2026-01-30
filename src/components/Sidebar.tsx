@@ -19,6 +19,7 @@ import {
   UserPlus,
   Building2,
   ChevronRight,
+  Activity,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from './ui/utils';
