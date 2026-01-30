@@ -47,9 +47,9 @@ export const Wizard: React.FC<WizardProps> = ({ steps, currentStep, onStepChange
                                     className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                     transition-all duration-300 cursor-pointer
-                    ${isCompleted ? 'bg-indigo-600 text-white' : ''}
-                    ${isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-900' : ''}
-                    ${isUpcoming ? 'bg-white dark:bg-slate-800 text-gray-400 dark:text-gray-500 border-2 border-gray-300 dark:border-slate-600' : ''}
+                    ${isCompleted ? 'bg-indigo-600 text-white cursor-pointer' : ''}
+                    ${isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-900 cursor-default' : ''}
+                    ${isUpcoming ? 'bg-white dark:bg-slate-800 text-gray-400 dark:text-gray-500 border-2 border-gray-300 dark:border-slate-600 cursor-not-allowed' : ''}
                   `}
                                     onClick={() => onStepChange?.(stepNumber)}
                                     whileHover={{ scale: 1.1 }}

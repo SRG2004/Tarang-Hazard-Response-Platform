@@ -32,7 +32,8 @@ export default defineConfig({
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        navigateFallback: 'index.html', // <== Critical for SPA offline support
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/__/], // Don't intercept API or Firebase Auth requests
         runtimeCaching: [
           // Cache OpenStreetMap tiles
           {

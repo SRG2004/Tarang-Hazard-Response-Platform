@@ -13,9 +13,9 @@ export const ROLES_CONFIG: Record<UserRole, RoleConfig> = {
     citizen: {
         allowedRoutes: [
             '/dashboard',
+            '/map-view',
             '/report-hazard',
             '/donate',
-            '/map-view',
             '/hazard-drills',
             '/emergency-contacts',
             '/infrastructure',

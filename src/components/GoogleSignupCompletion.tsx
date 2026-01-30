@@ -20,7 +20,7 @@ import { useAuth } from '../contexts/AuthContext';
 interface GoogleSignupCompletionProps {
   open: boolean;
   onClose: () => void;
-  onComplete: (aadharId: string) => void;
+  onComplete: (aadharId: string, name: string) => void;
   userName: string;
   userEmail: string;
   onSendOTP: (phone: string, verifier: RecaptchaVerifier) => Promise<ConfirmationResult>;
@@ -54,8 +54,16 @@ export function GoogleSignupCompletion({
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
 
+  const [nameLocal, setNameLocal] = useState(userName);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const confirmationResultRef = useRef<ConfirmationResult | null>(null);
+
+  // Update local name if prop changes (e.g. loads late)
+  useEffect(() => {
+    if (userName && userName !== 'User') {
+      setNameLocal(userName);
+    }
+  }, [userName]);
 
   useEffect(() => {
     // Initialize reCAPTCHA when dialog is open and we are in phone step (or if it was already initialized)
@@ -255,7 +263,7 @@ export function GoogleSignupCompletion({
 
       // Complete the flow
       setTimeout(() => {
-        onComplete(aadharId.replace(/\s/g, ''));
+        onComplete(aadharId.replace(/\s/g, ''), nameLocal);
       }, 1000);
     } catch (error: any) {
       console.error('Error setting password:', error);
@@ -271,7 +279,7 @@ export function GoogleSignupCompletion({
       return;
     }
     toast.info(t('googleSignup.skipPasswordHint'));
-    onComplete(aadharId.replace(/\s/g, ''));
+    onComplete(aadharId.replace(/\s/g, ''), nameLocal);
   };
 
   return (
@@ -298,7 +306,12 @@ export function GoogleSignupCompletion({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">{t('googleSignup.name')}</Label>
-                <Input id="name" value={userName} disabled />
+                <Input
+                  id="name"
+                  value={nameLocal}
+                  onChange={(e) => setNameLocal(e.target.value)}
+                  placeholder="John Doe"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t('login.email')}</Label>

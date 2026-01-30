@@ -261,6 +261,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+
+
+
+  // Shared helper to handle Google User profile creation/checking
+  const handleGoogleUser = async (user: FirebaseUser): Promise<{ user: FirebaseUser; needsCompletion: boolean }> => {
+    // Check if user profile exists, if not create one with citizen role
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    let needsCompletion = false;
+
+    if (!userDoc.exists()) {
+      const fallbackRole = getFallbackRole(user.email);
+      const userData: UserProfile = {
+        uid: user.uid,
+        email: user.email || '',
+        name: user.displayName || 'User',
+        role: fallbackRole, // Default based on configured fallback
+        phone: undefined,
+        phoneVerified: false,
+        createdAt: new Date().toISOString(),
+        metadata: {},
+      };
+      await setDoc(doc(db, 'users', user.uid), userData);
+      needsCompletion = true; // New user needs to complete profile
+    } else {
+      // Check if existing user needs completion (missing phone, not verified, or missing Aadhar ID)
+      const data = userDoc.data();
+      if (!data.phone || !data.phoneVerified || !data.aadharId) {
+        needsCompletion = true;
+      }
+    }
+    return { user, needsCompletion };
+  };
+
+  // Handle Redirect Result (for Mobile/Fallback flow)
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('Redirect login successful, handling user...');
+          await handleGoogleUser(result.user);
+          // Note: Navigation happens automatically via AuthStateChanged in App.tsx
+        }
+      } catch (error: any) {
+        console.error('Redirect sign-in error:', error);
+        // We could toast here, but AuthContext shouldn't depend on UI libraries strictly. 
+        // Ideally we'd set an error state exposed to the UI if needed.
+      }
+    };
+    handleRedirect();
+  }, []);
+
   const loginWithGoogle = async (): Promise<{ user: FirebaseUser; needsCompletion: boolean }> => {
     try {
       const provider = new GoogleAuthProvider();
@@ -281,7 +333,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('Mobile/WebView detected - using redirect method for Google sign-in');
         await signInWithRedirect(auth, provider);
         // If redirect succeeds, the page will reload and we'll handle it in useEffect
-        throw new Error('Redirecting to Google sign-in...');
+        // Return a dummy promise that never resolves (or throws to stop execution) to prevent UI flicker
+        return new Promise(() => { });
       }
 
       // On web, try popup first
@@ -295,39 +348,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user') {
           console.log('Popup blocked or closed, trying redirect method...');
           await signInWithRedirect(auth, provider);
-          // If redirect succeeds, the page will reload and we'll handle it in useEffect
-          throw new Error('Redirecting to Google sign-in...');
+          return new Promise(() => { }); // Wait for redirect
         }
         throw popupError;
       }
 
-      // Check if user profile exists, if not create one with citizen role
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      let needsCompletion = false;
+      // Use shared helper
+      return await handleGoogleUser(userCredential.user);
 
-      if (!userDoc.exists()) {
-        const fallbackRole = getFallbackRole(userCredential.user.email);
-        const userData: UserProfile = {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email || '',
-          name: userCredential.user.displayName || 'User',
-          role: fallbackRole, // Default based on configured fallback
-          phone: undefined,
-          phoneVerified: false,
-          createdAt: new Date().toISOString(),
-          metadata: {},
-        };
-        await setDoc(doc(db, 'users', userCredential.user.uid), userData);
-        needsCompletion = true; // New user needs to complete profile
-      } else {
-        // Check if existing user needs completion (missing phone, not verified, or missing Aadhar ID)
-        const data = userDoc.data();
-        if (!data.phone || !data.phoneVerified || !data.aadharId) {
-          needsCompletion = true;
-        }
-      }
-
-      return { user: userCredential.user, needsCompletion };
     } catch (error: any) {
       console.error('Google sign-in error details:', {
         code: error.code,
@@ -740,14 +768,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userProfileRef.current = userProfile;
   }, [userProfile]);
 
+  const isHandlingRedirectRef = useRef(false);
+
   // Handle Google sign-in redirect result
   useEffect(() => {
     const handleRedirectResult = async () => {
+      isHandlingRedirectRef.current = true;
+      setLoading(true);
       try {
         const result = await getRedirectResult(auth);
         if (result) {
           console.log('Google sign-in redirect successful:', result.user.email);
-          // User profile will be created/updated in onAuthStateChanged
           // Check if user profile exists and create if needed
           const userDoc = await getDoc(doc(db, 'users', result.user.uid));
           if (!userDoc.exists()) {
@@ -767,7 +798,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (error: any) {
         console.error('Error handling redirect result:', error);
-        // Don't throw - redirect errors are handled gracefully
+      } finally {
+        isHandlingRedirectRef.current = false;
+        setLoading(false);
       }
     };
 
@@ -932,16 +965,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             console.error('Error fetching user profile:', error);
-            if (!isRegisteringRef.current) {
+            if (!isRegisteringRef.current && !userProfileRef.current) {
+              // If we failed to load profile and we aren't registering, we might need to reset or handle error
+              // For now, allow loading to finish so app doesn't hang, but user might be null via profile check
               userProfileRef.current = null;
               setUserProfile(null);
             }
+          } finally {
+            // CRITICAL FIX: Only set loading to false AFTER all profile work is done.
+            if (!isHandlingRedirectRef.current) {
+              setLoading(false);
+            }
           }
         } else {
-          userProfileRef.current = null;
-          setUserProfile(null);
+          // Debounce logout to prevent flicker if this is a transient state
+          // (e.g. Firebase initializing or token refresh)
+          const logoutDelay = 2000;
+          setTimeout(() => {
+            // Check if we are still logged out after the delay
+            if (!auth.currentUser) {
+              console.log('Confirmed logout state after delay');
+              userProfileRef.current = null;
+              setUserProfile(null);
+              setCurrentUser(null);
+              setLoading(false);
+            } else {
+              console.log('Logout was transient, ignoring.');
+            }
+          }, logoutDelay);
+          // We return here to skip setting loading=false immediately
+          return;
         }
-      } finally {
+      } catch (authError) {
+        console.error("Auth State Change Error:", authError);
         setLoading(false);
       }
     });

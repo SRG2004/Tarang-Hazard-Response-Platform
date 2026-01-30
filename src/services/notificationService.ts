@@ -23,10 +23,6 @@ class NotificationService {
 
   // Initialize FCM
   async initialize(): Promise<boolean> {
-    // TEMPORARILY DISABLED: FCM backend not configured
-    console.log('Push notifications disabled');
-    return false;
-
     try {
       // Skip FCM entirely if VAPID key is missing or looks invalid
       if (!VAPID_KEY || VAPID_KEY.length < 50) {

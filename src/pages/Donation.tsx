@@ -5,8 +5,10 @@ import { HandHeart, TrendingUp, Users, Target } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
 import { PaymentModal } from '../components/payment/PaymentModal';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function Donation() {
+    const { t } = useTranslation();
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCampaign, setSelectedCampaign] = useState<any>(null);

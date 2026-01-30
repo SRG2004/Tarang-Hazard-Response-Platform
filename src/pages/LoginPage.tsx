@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { AnimatedInput, ActionButtons } from '../components/ui-redesign/Forms';
 import { TabGroup } from '../components/ui-redesign/Interactive';
 import { Chrome, Phone, Mail, UserPlus, LogIn, Lock, CreditCard, User } from 'lucide-react';
@@ -11,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, register, loginWithGoogle, sendOTP, verifyOTP } = useAuth();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,24 +34,24 @@ export function LoginPage() {
   const [otpSent, setOtpSent] = useState(false);
 
   const tabs = [
-    { id: 'login', label: 'Login', icon: <LogIn className="w-4 h-4" /> },
-    { id: 'register', label: 'Register', icon: <UserPlus className="w-4 h-4" /> },
-    { id: 'otp', label: 'OTP Login', icon: <Phone className="w-4 h-4" /> }
+    { id: 'login', label: t('login.login'), icon: LogIn },
+    { id: 'register', label: t('login.register'), icon: UserPlus },
+    { id: 'otp', label: t('login.otpLogin'), icon: Phone }
   ];
 
   /* Handlers (omitted for brevity in comments, kept logic same) */
   const handleLogin = async () => {
     if (!loginEmail || !loginPassword) {
-      toast.error('Please fill all fields');
+      toast.error(t('login.fillAllFields'));
       return;
     }
     setIsLoading(true);
     try {
       await login(loginEmail, loginPassword);
-      toast.success('Login successful!');
+      toast.success(t('login.loginSuccess'));
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      toast.error(error.message || t('login.loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -57,20 +59,20 @@ export function LoginPage() {
 
   const handleRegister = async () => {
     if (!registerName || !registerEmail || !registerPassword || !registerPhone || !registerAadhar) {
-      toast.error('Please fill all fields');
+      toast.error(t('login.fillAllFields'));
       return;
     }
     if (registerAadhar.length !== 12) {
-      toast.error('Aadhar number must be 12 digits');
+      toast.error(t('login.aadharMustBe12'));
       return;
     }
     setIsLoading(true);
     try {
       await register(registerEmail, registerPassword, registerName, registerAadhar, registerPhone, registerRole as any);
-      toast.success('Registration successful!');
+      toast.success(t('login.registrationSuccess'));
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      toast.error(error.message || t('login.registrationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +145,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-transparent relative overflow-hidden">
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-4 md:p-6 bg-transparent relative overflow-x-hidden">
       {/* 
         Key changes for smooth animation:
         1. Remove activeTab from className width logic to allow layout prop to handle it 
@@ -168,8 +170,8 @@ export function LoginPage() {
         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 dark:border-slate-700/50 overflow-hidden">
 
           <motion.div className="text-center mb-8" layout="position">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to Tarang</h1>
-            <p className="text-gray-600 dark:text-gray-300">Hazard Response Platform</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('login.welcomeToTarang')}</h1>
+            <p className="text-gray-600 dark:text-gray-300">{t('login.subtitle')}</p>
           </motion.div>
 
           {/* Pass layout prop to TabGroup if it supports it, otherwise wrap it */}
@@ -193,16 +195,16 @@ export function LoginPage() {
                   className="space-y-4 max-w-md mx-auto"
                 >
                   <AnimatedInput
-                    label="Email"
+                    label={t('login.email')}
                     type="email"
                     value={loginEmail}
                     onChange={setLoginEmail}
-                    placeholder="your@email.com"
+                    placeholder={t('login.emailPlaceholder')}
                     icon={<Mail className="w-4 h-4" />}
                     required
                   />
                   <AnimatedInput
-                    label="Password"
+                    label={t('login.password')}
                     type="password"
                     value={loginPassword}
                     onChange={setLoginPassword}
@@ -210,11 +212,11 @@ export function LoginPage() {
                     icon={<Lock className="w-4 h-4" />}
                     required
                   />
-                  <ActionButtons onSubmit={handleLogin} submitLabel="Login" isSubmitting={isLoading} />
+                  <ActionButtons onSubmit={handleLogin} submitLabel={t('login.login')} isSubmitting={isLoading} />
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-700"></div></div>
-                    <div className="relative flex justify-center text-sm"><span className="px-2 bg-white dark:bg-slate-900 text-gray-500">Or continue with</span></div>
+                    <div className="relative flex justify-center text-sm"><span className="px-2 bg-white dark:bg-slate-900 text-gray-500">{t('login.orContinue')}</span></div>
                   </div>
 
                   <motion.button
@@ -223,7 +225,7 @@ export function LoginPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Chrome className="w-5 h-5" /> Sign in with Google
+                    <Chrome className="w-5 h-5" /> {t('login.signInWithGoogle')}
                   </motion.button>
                 </motion.div>
               )}

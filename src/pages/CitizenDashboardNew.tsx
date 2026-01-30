@@ -8,11 +8,14 @@ import { HazardCard } from '../components/feed/HazardCard';
 import { DashboardStats } from '../components/feed/DashboardStats';
 import { Loader2, Filter, ChevronDown, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { HAZARDS } from '../config/hazards';
 import { PageContainer } from '../components/ui-redesign/PageLayouts';
+import { LiveThreatsBulletin } from '../components/feed/LiveThreatsBulletin';
 
 export function CitizenDashboardNew() {
     const { currentUser } = useAuth();
+    const { t } = useTranslation();
     const [reports, setReports] = useState<HazardReport[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTypes, setSelectedTypes] = useState<HazardType[]>([]);
@@ -124,9 +127,12 @@ export function CitizenDashboardNew() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Disaster Feed</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Real-time hazard reports from your community</p>
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('citizenDashboard.title')}</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{t('citizenDashboard.subtitle')}</p>
                 </motion.div>
+
+                {/* Live Threats Bulletin */}
+                <LiveThreatsBulletin />
 
                 {/* Stats */}
                 <DashboardStats
@@ -151,7 +157,7 @@ export function CitizenDashboardNew() {
                                     className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
                                 >
                                     <Filter className="w-4 h-4" />
-                                    <span>Type {selectedTypes.length > 0 && `(${selectedTypes.length})`}</span>
+                                    <span>{t('citizenDashboard.type')} {selectedTypes.length > 0 && `(${selectedTypes.length})`}</span>
                                     <ChevronDown className={`w-4 h-4 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`} />
                                 </button>
 
@@ -219,7 +225,7 @@ export function CitizenDashboardNew() {
                                                 <button
                                                     key={severity}
                                                     onClick={() => toggleSeverity(severity)}
-                                                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                                                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                                                 >
                                                     <input
                                                         type="checkbox"
@@ -231,7 +237,7 @@ export function CitizenDashboardNew() {
                                                         className="w-3 h-3 rounded-full"
                                                         style={{ backgroundColor: severityColors[severity as keyof typeof severityColors] }}
                                                     />
-                                                    <span className="text-sm text-gray-700 dark:text-gray-200 capitalize">{severity}</span>
+                                                    <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">{severity}</span>
                                                 </button>
                                             ))}
                                         </motion.div>
@@ -290,8 +296,8 @@ export function CitizenDashboardNew() {
                                 onChange={(e) => setSortBy(e.target.value as 'date' | 'severity')}
                                 className="px-4 py-2 bg-gray-100 dark:bg-slate-700 border-none rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500"
                             >
-                                <option value="date">Sort by Date</option>
-                                <option value="severity">Sort by Severity</option>
+                                <option value="date">{t('citizenDashboard.sortByDate')}</option>
+                                <option value="severity">{t('citizenDashboard.sortBySeverity')}</option>
                             </select>
 
                             {(selectedTypes.length > 0 || selectedSeverities.length > 0 || selectedStatuses.length > 0) && (
@@ -300,7 +306,7 @@ export function CitizenDashboardNew() {
                                     className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2"
                                 >
                                     <X className="w-4 h-4" />
-                                    Clear
+                                    {t('citizenDashboard.clear')}
                                 </button>
                             )}
                         </div>
@@ -314,8 +320,8 @@ export function CitizenDashboardNew() {
                     </div>
                 ) : sortedReports.length === 0 ? (
                     <div className="text-center py-20">
-                        <p className="text-gray-500 text-lg">No reports found</p>
-                        <p className="text-gray-400 text-sm mt-2">Try adjusting your filters</p>
+                        <p className="text-gray-500 text-lg">{t('citizenDashboard.noReports')}</p>
+                        <p className="text-gray-400 text-sm mt-2">{t('citizenDashboard.adjustFilters')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

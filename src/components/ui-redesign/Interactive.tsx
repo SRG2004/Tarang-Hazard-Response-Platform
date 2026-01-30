@@ -19,7 +19,12 @@ export const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, onChange })
             <div className="flex gap-1 overflow-x-auto pb-px no-scrollbar">
                 {tabs.map((tab, index) => {
                     const isActive = activeTab === tab.id;
-                    const Icon = tab.icon as React.ElementType;
+                    const iconContent = React.isValidElement(tab.icon) ? tab.icon : (tab.icon ? (
+                        (() => {
+                            const Icon = tab.icon as any;
+                            return <Icon className="w-4 h-4" />;
+                        })()
+                    ) : null);
                     return (
                         <motion.button
                             key={tab.id}
@@ -34,7 +39,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, onChange })
                             whileHover={{ y: -2 }}
                         >
                             <div className="flex items-center gap-2">
-                                {Icon && <Icon className="w-4 h-4" />}
+                                {iconContent}
                                 {tab.label}
                             </div>
                             {isActive && (

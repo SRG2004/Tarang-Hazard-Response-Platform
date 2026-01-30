@@ -4,14 +4,15 @@ import { AnimatedInput, AnimatedSelect, FormSection, ActionButtons } from '../co
 import { TabGroup } from '../components/ui-redesign/Interactive';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function Settings() {
   const { currentUser, userProfile } = useAuth();
+  const { language, setLanguage } = useTranslation();
   const [activeTab, setActiveTab] = useState('profile');
   const [name, setName] = useState(userProfile?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [phone, setPhone] = useState(userProfile?.phone || '');
-  const [language, setLanguage] = useState('en');
   const [notifications, setNotifications] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -113,8 +114,8 @@ export function Settings() {
                   className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">Email Notifications</p>
-                  <p className="text-sm text-gray-600">Receive updates via email</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Email Notifications</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Receive updates via email</p>
                 </div>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
@@ -124,8 +125,8 @@ export function Settings() {
                   className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">Push Notifications</p>
-                  <p className="text-sm text-gray-600">Receive browser notifications</p>
+                  <p className="font-medium text-gray-900 dark:text-white">Push Notifications</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Receive browser notifications</p>
                 </div>
               </label>
             </div>

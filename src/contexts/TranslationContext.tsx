@@ -314,6 +314,18 @@ const translations: Record<string, Record<string, string>> = {
     'dashboard.geographicDistribution': 'Geographic Distribution',
     'dashboard.noGeoData': 'No geographic data available',
 
+    // Citizen Dashboard
+    'citizenDashboard.title': 'Disaster Feed',
+    'citizenDashboard.subtitle': 'Real-time hazard reports from your community',
+    'citizenDashboard.type': 'Type',
+    'citizenDashboard.severity': 'Severity',
+    'citizenDashboard.status': 'Status',
+    'citizenDashboard.sortByDate': 'Sort by Date',
+    'citizenDashboard.sortBySeverity': 'Sort by Severity',
+    'citizenDashboard.clear': 'Clear',
+    'citizenDashboard.noReports': 'No reports found',
+    'citizenDashboard.adjustFilters': 'Try adjusting your filters',
+
     // Volunteer Registration
     'volunteer.title': 'Volunteer Registration',
     'volunteer.description': 'Join our network of coastal volunteers and help monitor ocean hazards in your community.',
@@ -343,8 +355,10 @@ const translations: Record<string, Record<string, string>> = {
 
     // Login & Registration
     'login.subtitle': 'Ocean Hazard Reporting & Monitoring Platform',
+    'login.welcomeToTarang': 'Welcome to Tarang',
     'login.login': 'Login',
     'login.register': 'Register',
+    'login.otpLogin': 'OTP Login',
     'login.email': 'Email',
     'login.emailPlaceholder': 'your.email@example.com',
     'login.password': 'Password',
@@ -373,6 +387,11 @@ const translations: Record<string, Record<string, string>> = {
     'login.resetPasswordDesc': 'Enter your email address and we\'ll send you a link to reset your password.',
     'login.sendResetLink': 'Send Reset Link',
     'login.loginSuccess': 'Successfully logged in!',
+    'login.loginFailed': 'Login failed',
+    'login.fillAllFields': 'Please fill all fields',
+    'login.aadharMustBe12': 'Aadhar number must be 12 digits',
+    'login.registrationSuccess': 'Registration successful!',
+    'login.registrationFailed': 'Registration failed',
     'login.enterEmail': 'Please enter your email address',
     'login.resetEmailSent': 'Password reset email sent! Check your inbox.',
     'login.invalidPhone': 'Please enter a valid 10-digit phone number',
@@ -385,6 +404,14 @@ const translations: Record<string, Record<string, string>> = {
     'login.accountCreated': 'Account created successfully!',
     'login.googleSignInSuccess': 'Successfully signed in with Google!',
     'login.profileCompleted': 'Profile completed successfully!',
+    'login.personalDetails': 'Personal Details',
+    'login.securityAndRole': 'Security & Role',
+    'login.aadharNumber': 'Aadhar Number',
+    'login.aadharPlaceholder': '12-digit ID',
+    'login.role': 'Role',
+    'login.otpFailed': 'Failed to send OTP',
+    'login.invalidOTPCode': 'Invalid OTP',
+    'login.phonePlaceholder': '+91...',
 
     // Google Sign-up Completion
     'googleSignup.title': 'Complete Your Profile',
@@ -492,6 +519,14 @@ const translations: Record<string, Record<string, string>> = {
     'nav.systemSettings': 'System Settings',
 
     // Map View
+    'map.title': 'Hazard Map',
+    'map.subtitle': 'Real-time disaster locations and alerts',
+    'map.clearFilters': 'Clear Filters',
+    'map.activeHazards': 'Active Hazards',
+    'map.emergencyResources': 'Emergency Resources',
+    'map.satelliteView': 'Satellite View',
+    'map.layers': 'Layers',
+    'map.all': 'All',
     'map.interactiveCoastalMap': 'Interactive Coastal Map',
     'map.hazards': 'Hazards',
     'map.weather': 'Weather',

@@ -6,6 +6,7 @@ import { ActionCard, InfoCard, LoadingState } from '../components/ui-redesign/Ca
 import { Users, FileText, Settings, Database, AlertTriangle, Activity, Package } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
+import { useTranslation } from '../contexts/TranslationContext';
 
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -56,6 +57,7 @@ function RecentCriticalReports() {
 
 export function AuthorityDashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalReports: 0,

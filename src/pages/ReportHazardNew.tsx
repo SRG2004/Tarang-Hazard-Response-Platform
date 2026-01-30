@@ -16,7 +16,7 @@ import { LocationPickerMap } from '../components/LocationPickerMap';
 import { VoiceInput } from '../components/VoiceInput';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
-import { Upload, MapPin, Navigation, Image as ImageIcon, Video as VideoIcon, CheckCircle } from 'lucide-react';
+import { Upload, MapPin, Navigation, Image as ImageIcon, Video as VideoIcon, CheckCircle, Camera } from 'lucide-react';
 import { HazardType } from '../types';
 import { AnimatedPage } from '../components/AnimatedComponents';
 
@@ -156,7 +156,7 @@ export function ReportHazard() {
             case 1: return hazardType !== '';
             case 2: return severity !== '';
             case 3: return (latitude !== '' && longitude !== '') || location !== '';
-            case 4: return true; // Description is optional
+            case 4: return description.trim().length >= 10; // Require at least 10 characters
             case 5: return true;
             default: return false;
         }
@@ -180,7 +180,13 @@ export function ReportHazard() {
                 <Wizard
                     steps={wizardSteps}
                     currentStep={currentStep}
-                    onStepChange={setCurrentStep}
+                    onStepChange={(step) => {
+                        // Only allow navigating back via the stepper. 
+                        // Forward navigation must go through the "Next" button which validates data.
+                        if (step < currentStep) {
+                            setCurrentStep(step);
+                        }
+                    }}
                 >
                     <AnimatePresence mode="wait">
                         {/* Step 1: Hazard Type */}
@@ -364,48 +370,78 @@ export function ReportHazard() {
                                     </div>
 
                                     {/* Media Upload */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {/* Photo Upload */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        {/* Take Photo (Camera) */}
                                         <motion.label
-                                            className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors"
+                                            className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors flex flex-col items-center justify-center"
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                         >
                                             <input
                                                 type="file"
                                                 accept="image/*"
+                                                capture="environment"
                                                 onChange={(e) => setPhoto(e.target.files?.[0] || null)}
                                                 className="hidden"
                                             />
                                             {photo ? (
                                                 <div className="text-green-600">
                                                     <CheckCircle className="w-8 h-8 mx-auto mb-2" />
-                                                    <p className="text-sm font-medium">{photo.name}</p>
+                                                    <p className="text-xs font-medium truncate max-w-[100px]">{photo.name}</p>
+                                                    <p className="text-[10px] text-gray-400">Tap to Retake</p>
+                                                </div>
+                                            ) : (
+                                                <div className="text-gray-500">
+                                                    <Camera className="w-8 h-8 mx-auto mb-2" />
+                                                    <p className="text-sm font-medium">Take Photo</p>
+                                                </div>
+                                            )}
+                                        </motion.label>
+
+                                        {/* Upload from Gallery */}
+                                        <motion.label
+                                            className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors flex flex-col items-center justify-center"
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                // No capture attribute implies gallery choice usually
+                                                onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                                                className="hidden"
+                                            />
+                                            {photo ? (
+                                                <div className="text-green-600">
+                                                    <CheckCircle className="w-8 h-8 mx-auto mb-2" />
+                                                    <p className="text-xs font-medium truncate max-w-[100px]">{photo.name}</p>
+                                                    <p className="text-[10px] text-gray-400">Tap to Change</p>
                                                 </div>
                                             ) : (
                                                 <div className="text-gray-500">
                                                     <ImageIcon className="w-8 h-8 mx-auto mb-2" />
-                                                    <p className="text-sm font-medium">Upload Photo</p>
+                                                    <p className="text-sm font-medium">Gallery</p>
                                                 </div>
                                             )}
                                         </motion.label>
 
                                         {/* Video Upload */}
                                         <motion.label
-                                            className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors"
+                                            className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center cursor-pointer hover:border-indigo-400 transition-colors flex flex-col items-center justify-center"
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                         >
                                             <input
                                                 type="file"
                                                 accept="video/*"
+                                                capture="environment"
                                                 onChange={(e) => setVideo(e.target.files?.[0] || null)}
                                                 className="hidden"
                                             />
                                             {video ? (
                                                 <div className="text-green-600">
                                                     <CheckCircle className="w-8 h-8 mx-auto mb-2" />
-                                                    <p className="text-sm font-medium">{video.name}</p>
+                                                    <p className="text-xs font-medium truncate max-w-[100px]">{video.name}</p>
                                                 </div>
                                             ) : (
                                                 <div className="text-gray-500">

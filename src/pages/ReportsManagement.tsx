@@ -6,6 +6,7 @@ import { InfoCard, LoadingState, EmptyState } from '../components/ui-redesign/Ca
 import { FileText, MapPin, Calendar, CheckCircle, XCircle, Clock, Sparkles, Brain, AlertTriangle } from 'lucide-react';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
+import { useTranslation } from '../contexts/TranslationContext';
 
 // Helper functions for confidence score colors
 function getConfidenceColorBg(confidence: number): string {
@@ -64,6 +65,7 @@ function formatDate(dateValue: any) {
 
 
 export function ReportsManagement() {
+  const { t } = useTranslation();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -344,10 +346,10 @@ export function ReportsManagement() {
                   </div>
 
                   {report.severity && (
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full capitalize mt-2 ${report.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                      report.severity === 'high' ? 'bg-orange-100 text-orange-700' :
-                        report.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
+                    <span className={`inline-block px-2 py-1 text-xs rounded-full capitalize mt-2 ${report.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800' :
+                      report.severity === 'high' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800' :
+                        report.severity === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800' :
+                          'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
                       }`}>
                       {report.severity}
                     </span>
@@ -355,7 +357,7 @@ export function ReportsManagement() {
 
                   {/* AI Analysis Section */}
                   {report.confidenceScore !== undefined && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-800">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1">
                           <Sparkles className="w-4 h-4 text-purple-500" />
@@ -383,7 +385,7 @@ export function ReportsManagement() {
                               }
                             }}
                             disabled={processingId === report.id}
-                            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 transition-colors"
+                            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 transition-colors"
                             title="Re-analyze with AI"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-refresh-cw ${processingId === report.id ? 'animate-spin' : ''}`}>
@@ -410,15 +412,15 @@ export function ReportsManagement() {
                       {/* Auto-rejection badge with reason */}
                       {report.autoRejected && (
                         <div className="mt-2 text-xs">
-                          <div className="p-2 bg-orange-50 border border-orange-200 rounded flex items-center gap-2 mb-1">
-                            <AlertTriangle className="w-3 h-3 text-orange-600" />
-                            <span className="text-orange-700 font-medium">Auto-rejected by AI</span>
+                          <div className="p-2 bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-900/30 rounded flex items-center gap-2 mb-1">
+                            <AlertTriangle className="w-3 h-3 text-orange-600 dark:text-orange-400" />
+                            <span className="text-orange-700 dark:text-orange-300 font-medium">Auto-rejected by AI</span>
                           </div>
                           {/* Fallback to generic message if no specific reason is found */}
                           <div className="text-gray-600 dark:text-gray-400 pl-1">
                             <span className="font-medium">Reason:</span> {
                               (report.aiAnalysis?.imageAnalysis?.confidence < 0.5 && (report.aiAnalysis?.imageAnalysis?.reasoning || report.aiAnalysis?.imageAnalysis?.error))
-                                ? <span className="text-red-600 font-medium ml-1">
+                                ? <span className="text-red-600 dark:text-red-400 font-medium ml-1">
                                   Image Issue: {
                                     (report.aiAnalysis.imageAnalysis.error && typeof report.aiAnalysis.imageAnalysis.error === 'string' && report.aiAnalysis.imageAnalysis.error.includes('API key'))
                                       ? "AI Service Unavailable (Configuration Error)"
@@ -426,11 +428,11 @@ export function ReportsManagement() {
                                   }
                                 </span>
                                 : (report.aiAnalysis?.imageError)
-                                  ? <span className="text-red-600 font-medium ml-1">Image Analysis Failed: {report.aiAnalysis.imageError}</span>
+                                  ? <span className="text-red-600 dark:text-red-400 font-medium ml-1">Image Analysis Failed: {String(report.aiAnalysis.imageError)}</span>
                                   : (report.aiAnalysis?.textAnalysis?.confidence < 0.5 && (report.aiAnalysis?.textAnalysis?.reasoning || report.aiAnalysis?.textAnalysis?.error))
-                                    ? <span className="text-orange-600 font-medium ml-1">Text Issue: {report.aiAnalysis.textAnalysis.reasoning || report.aiAnalysis.textAnalysis.error}</span>
+                                    ? <span className="text-orange-600 dark:text-orange-400 font-medium ml-1">Text Issue: {String(report.aiAnalysis.textAnalysis.reasoning || report.aiAnalysis.textAnalysis.error)}</span>
                                     : (report.aiAnalysis?.textError)
-                                      ? <span className="text-orange-600 font-medium ml-1">Text Analysis Failed: {report.aiAnalysis.textError}</span>
+                                      ? <span className="text-orange-600 dark:text-orange-400 font-medium ml-1">Text Analysis Failed: {String(report.aiAnalysis.textError)}</span>
                                       : report.rejectionReason || "Does not meet safety criteria."
                             }
                           </div>

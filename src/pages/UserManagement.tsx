@@ -18,8 +18,10 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import apiService from '../services/apiService';
 import { toast } from 'sonner';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function UserManagement() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

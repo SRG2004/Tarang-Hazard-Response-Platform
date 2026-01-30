@@ -16,7 +16,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
     const getStatusBadge = () => {
         if (report.status === 'verified' || report.verifiedBy) {
             return (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
                     <CheckCircle className="w-3 h-3" />
                     Verified
                 </span>
@@ -24,14 +24,14 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
         }
         if (report.status === 'solved') {
             return (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-full">
                     <CheckCircle className="w-3 h-3" />
                     Resolved
                 </span>
             );
         }
         return (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full">
                 <Clock className="w-3 h-3" />
                 Pending
             </span>
@@ -40,11 +40,11 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
 
     const getSeverityColor = () => {
         switch (report.severity) {
-            case 'critical': return 'bg-red-100 text-red-700 border-red-200';
-            case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
-            case 'moderate': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-            case 'low': return 'bg-green-100 text-green-700 border-green-200';
-            default: return 'bg-gray-100 text-gray-700 border-gray-200';
+            case 'critical': return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/50';
+            case 'high': return 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/50';
+            case 'moderate': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50';
+            case 'low': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50';
+            default: return 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-slate-700/50';
         }
     };
 
@@ -90,7 +90,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({ report, index, onClick }
             <div className="p-6">
                 {/* Title and Status */}
                 <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-lg font-bold text-gray-900 flex-1 pr-2">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex-1 pr-2">
                         {report.title}
                     </h3>
                     {getStatusBadge()}

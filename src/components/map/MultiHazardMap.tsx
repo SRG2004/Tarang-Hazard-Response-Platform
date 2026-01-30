@@ -139,9 +139,11 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                 if (!hazardConfig) return;
 
                 // Create standard legacy marker
+                const isUrgent = report.severity === 'critical' || report.severity === 'high';
                 const marker = new (window as any).google.maps.Marker({
                     position: { lat: report.latitude, lng: report.longitude },
                     title: report.title,
+                    optimized: false, // Required for custom CSS classes
                     icon: {
                         path: (window as any).google.maps.SymbolPath.CIRCLE,
                         fillColor: hazardConfig.color,
@@ -152,32 +154,54 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                     }
                 });
 
-                // Create info window
+                // Add blinking class if urgent
+                if (isUrgent) {
+                    // Note: Legacy markers don't support arbitrary CSS classes easily 
+                    // without custom overlays, but we can use AdvancedMarkerElement if available
+                    // or just set a custom property for now if we were using HTML markers.
+                    // For now, let's stick to the legend/circles and try to use AdvancedMarkerElement
+                    // if the version supports it.
+                }
+
+                // Create info window with improved styling for both light and dark modes
                 const infoWindow = new (window as any).google.maps.InfoWindow({
                     content: `
-                    <div style="padding: 12px; max-width: 300px;">
-                        <h3 style="font-weight: bold; font-size: 16px; margin: 0 0 8px 0;">${report.title}</h3>
-                        <span style="display: inline-block; padding: 4px 8px; border-radius: 12px; background-color: ${hazardConfig.color}; color: white; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">
-                            ${report.severity}
-                        </span>
-                        <p style="margin: 8px 0; font-size: 14px; color: #666;">${report.description || 'No description'}</p>
-                        <p style="margin: 4px 0; font-size: 12px; color: #999;">
-                            Reported: ${(() => {
+                    <div style="padding: 16px; max-width: 320px; font-family: Inter, system-ui, sans-serif; border-radius: 12px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <h3 style="font-weight: 700; font-size: 18px; margin: 0; color: #1e293b;">${report.title}</h3>
+                            <span style="padding: 4px 10px; border-radius: 20px; background-color: ${hazardConfig.color}; color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                ${report.severity}
+                            </span>
+                        </div>
+                        
+                        <div style="margin-bottom: 12px; border-left: 3px solid ${hazardConfig.color}; padding-left: 12px;">
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.5;">${report.description || 'No detailed description provided.'}</p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                            <div>
+                                <span style="display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Status</span>
+                                <span style="font-size: 13px; font-weight: 600; color: #334155;">${report.status?.toUpperCase() || 'NEW'}</span>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Time</span>
+                                <span style="font-size: 13px; font-weight: 600; color: #334155;">
+                                    ${(() => {
                             try {
                                 const ts = report.submittedAt as any;
                                 if (!ts) return 'Unknown';
-                                // Handle Firestore Timestamp
                                 if (typeof ts.toDate === 'function') {
-                                    return ts.toDate().toLocaleDateString();
+                                    return ts.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                 }
-                                // Handle string or number timestamps
                                 const date = new Date(ts);
-                                return isNaN(date.getTime()) ? 'Unknown' : date.toLocaleDateString();
-                            } catch {
-                                return 'Unknown';
-                            }
+                                return isNaN(date.getTime()) ? 'Unknown' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            } catch { return 'Unknown'; }
                         })()}
-                        </p>
+                                </span>
+                            </div>
+                        </div>
+
+
                     </div>
                 `
                 });

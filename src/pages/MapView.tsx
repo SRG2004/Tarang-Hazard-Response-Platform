@@ -5,8 +5,10 @@ import { Layers, MapPin, Filter, X, Map as MapIcon, ChevronDown } from 'lucide-r
 import { motion, AnimatePresence } from 'framer-motion';
 import { HAZARDS } from '../config/hazards';
 import { HazardType } from '../types';
+import { useTranslation } from '../contexts/TranslationContext';
 
 export function MapView() {
+  const { t } = useTranslation();
   const [activeLayers, setActiveLayers] = useState({
     hazards: true,
     resources: true,
@@ -81,29 +83,29 @@ export function MapView() {
     <PageContainer className="!p-0">
       <div className="h-screen w-full flex flex-col bg-transparent">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <MapIcon className="w-6 h-6 text-indigo-600" />
+              <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+                <MapIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Hazard Map</h1>
-                <p className="text-sm text-gray-600">Real-time disaster locations and alerts</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('map.title')}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('map.subtitle')}</p>
               </div>
             </div>
             <button
               onClick={clearFilters}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-2"
             >
               <X className="w-4 h-4" />
-              Clear Filters
+              {t('map.clearFilters')}
             </button>
           </div>
         </div>
 
         {/* Horizontal Taskbar with Dropdown Filters */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-3 shadow-sm">
           <div className="flex items-center gap-4" ref={dropdownRef}>
             {/* Map Layers Dropdown */}
             <div className="relative">
@@ -113,7 +115,7 @@ export function MapView() {
                   setShowSeverityDropdown(false);
                   setShowTypesDropdown(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
               >
                 <Layers className="w-4 h-4" />
                 <span>Layers</span>
@@ -126,10 +128,10 @@ export function MapView() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 py-2 z-50"
                   >
-                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                      <span className="text-sm text-gray-700">Active Hazards</span>
+                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('map.activeHazards')}</span>
                       <input
                         type="checkbox"
                         checked={activeLayers.hazards}
@@ -137,8 +139,8 @@ export function MapView() {
                         className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                       />
                     </label>
-                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                      <span className="text-sm text-gray-700">Emergency Resources</span>
+                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('map.emergencyResources')}</span>
                       <input
                         type="checkbox"
                         checked={activeLayers.resources}
@@ -146,8 +148,8 @@ export function MapView() {
                         className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                       />
                     </label>
-                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                      <span className="text-sm text-gray-700">Satellite View</span>
+                    <label className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t('map.satelliteView')}</span>
                       <input
                         type="checkbox"
                         checked={activeLayers.satellite}
@@ -168,7 +170,7 @@ export function MapView() {
                   setShowLayersDropdown(false);
                   setShowTypesDropdown(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
               >
                 <Filter className="w-4 h-4" />
                 <span>Severity</span>
@@ -181,13 +183,13 @@ export function MapView() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 py-2 z-50"
                   >
                     {['all', 'critical', 'high', 'medium', 'low'].map((severity) => (
                       <button
                         key={severity}
                         onClick={() => handleSeverityToggle(severity)}
-                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                       >
                         <input
                           type="checkbox"
