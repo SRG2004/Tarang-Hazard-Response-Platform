@@ -161,8 +161,8 @@ export function LoginPage() {
         id="login-container"
         initial={false}
         animate={{
-          width: activeTab === 'register' ? '100%' : '100%',
-          maxWidth: activeTab === 'register' ? '56rem' : '28rem' // 56rem (4xl) vs 28rem (md)
+          width: '100%',
+          maxWidth: (activeTab === 'register' || activeTab === 'login') ? '56rem' : '28rem' // 56rem (4xl) for form+demo or register
         }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         className="relative z-10 w-full"
@@ -192,50 +192,60 @@ export function LoginPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.2 }}
-                  className="space-y-4 max-w-md mx-auto"
+                  className="grid grid-cols-1 md:grid-cols-2 gap-8"
                 >
-                  <AnimatedInput
-                    label={t('login.email')}
-                    type="email"
-                    value={loginEmail}
-                    onChange={setLoginEmail}
-                    placeholder={t('login.emailPlaceholder')}
-                    icon={<Mail className="w-4 h-4" />}
-                    required
-                  />
-                  <AnimatedInput
-                    label={t('login.password')}
-                    type="password"
-                    value={loginPassword}
-                    onChange={setLoginPassword}
-                    placeholder="••••••••"
-                    icon={<Lock className="w-4 h-4" />}
-                    required
-                  />
-                  <ActionButtons onSubmit={handleLogin} submitLabel={t('login.login')} isSubmitting={isLoading} />
+                  {/* Left Column: Login Form */}
+                  <div className="space-y-4">
+                    <AnimatedInput
+                      label={t('login.email')}
+                      type="email"
+                      value={loginEmail}
+                      onChange={setLoginEmail}
+                      placeholder={t('login.emailPlaceholder')}
+                      icon={<Mail className="w-4 h-4" />}
+                      required
+                    />
+                    <AnimatedInput
+                      label={t('login.password')}
+                      type="password"
+                      value={loginPassword}
+                      onChange={setLoginPassword}
+                      placeholder="••••••••"
+                      icon={<Lock className="w-4 h-4" />}
+                      required
+                    />
+                    <ActionButtons onSubmit={handleLogin} submitLabel={t('login.login')} isSubmitting={isLoading} />
 
-                  <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-700"></div></div>
-                    <div className="relative flex justify-center text-sm"><span className="px-2 bg-white dark:bg-slate-900 text-gray-500">{t('login.orContinue')}</span></div>
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-700"></div></div>
+                      <div className="relative flex justify-center text-sm"><span className="px-2 bg-white dark:bg-slate-900 text-gray-500">{t('login.orContinue')}</span></div>
+                    </div>
+
+                    <motion.button
+                      onClick={handleGoogleLogin}
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Chrome className="w-5 h-5" /> {t('login.signInWithGoogle')}
+                    </motion.button>
                   </div>
 
-                  <motion.button
-                    onClick={handleGoogleLogin}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Chrome className="w-5 h-5" /> {t('login.signInWithGoogle')}
-                  </motion.button>
+                  {/* Right Column: Demo Access */}
+                  <div className="space-y-4 md:border-l md:border-gray-200 md:dark:border-gray-700 md:pl-8 flex flex-col justify-center">
+                    <div className="mb-2 text-center md:text-left">
+                      <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">Demo Access</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        Quickly explore the platform using these pre-configured role accounts.
+                      </p>
+                    </div>
 
-                  <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-center text-gray-500 mb-3 uppercase tracking-wider font-semibold">Demo Access</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       {[
-                        { role: 'citizen', label: 'Citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
-                        { role: 'authority', label: 'Authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
-                        { role: 'responder', label: 'Responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
-                        { role: 'ngo', label: 'NGO', color: 'bg-green-50 text-green-700 hover:bg-green-100' }
+                        { role: 'citizen', label: 'Citizen', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
+                        { role: 'authority', label: 'Authority', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
+                        { role: 'responder', label: 'Responder', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200' },
+                        { role: 'ngo', label: 'NGO', color: 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200' }
                       ].map((item) => (
                         <button
                           key={item.role}
@@ -244,9 +254,10 @@ export function LoginPage() {
                             setLoginPassword('password');
                             toast.info(`Filled ${item.label} credentials`);
                           }}
-                          className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${item.color}`}
+                          className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] ${item.color}`}
                         >
-                          {item.label}
+                          <span className="font-semibold text-sm">{item.label}</span>
+                          <span className="text-[10px] opacity-70 mt-1">Click to fill</span>
                         </button>
                       ))}
                     </div>
