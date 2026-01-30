@@ -114,8 +114,12 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // Use sessionStorage to remember if user was logged in (prevents flash on reload)
+  const wasLoggedIn = sessionStorage.getItem('tarang_auth_active') === 'true';
+
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  // Start with loading=true if we think user might be logged in
   const [loading, setLoading] = useState(true);
   const isRegisteringRef = useRef(false); // Track if we're currently registering
   const userProfileRef = useRef<UserProfile | null>(null); // Ref to track userProfile without causing re-renders
@@ -756,6 +760,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async (): Promise<void> => {
     try {
+      // Clear session storage to prevent flash on next load
+      sessionStorage.removeItem('tarang_auth_active');
       await signOut(auth);
       setUserProfile(null);
     } catch (error) {
@@ -939,6 +945,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 console.log('Setting userProfile from onAuthStateChanged:', { uid: profile.uid, role: profile.role, dataRole: data.role, finalRole: userRole });
                 userProfileRef.current = profile;
                 setUserProfile(profile);
+                // Mark as logged in for faster reload (prevents login flash)
+                sessionStorage.setItem('tarang_auth_active', 'true');
               }
             } else {
               // Only create default profile if we're not registering (e.g., Google sign-in)

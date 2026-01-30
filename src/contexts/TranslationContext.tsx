@@ -1018,6 +1018,34 @@ const translations: Record<string, Record<string, string>> = {
     'page.volunteerRegistration': 'स्वयंसेवक पंजीकरण',
     'page.donate': 'दान करें',
 
+    // Citizen Dashboard
+    'citizenDashboard.title': 'आपदा फ़ीड',
+    'citizenDashboard.subtitle': 'आपके समुदाय से वास्तविक समय खतरे की रिपोर्ट',
+    'citizenDashboard.type': 'प्रकार',
+    'citizenDashboard.severity': 'गंभीरता',
+    'citizenDashboard.status': 'स्थिति',
+    'citizenDashboard.sortByDate': 'तारीख के अनुसार',
+    'citizenDashboard.sortBySeverity': 'गंभीरता के अनुसार',
+    'citizenDashboard.clear': 'साफ़ करें',
+    'citizenDashboard.noReports': 'कोई रिपोर्ट नहीं मिली',
+    'citizenDashboard.adjustFilters': 'अपने फ़िल्टर समायोजित करें',
+
+    // Map View
+    'map.title': 'खतरा मानचित्र',
+    'map.subtitle': 'रिपोर्ट किए गए खतरों और संसाधनों का वास्तविक-समय दृश्य',
+    'map.clearFilters': 'फ़िल्टर साफ़ करें',
+    'map.activeHazards': 'सक्रिय खतरे',
+    'map.safeFishing': 'सुरक्षित मछली पकड़ने के स्थान',
+    'map.weather': 'मौसम',
+    'map.incoAlerts': 'INCOIS अलर्ट',
+    'map.emergency': 'आपातकालीन बुनियादी ढांचा',
+
+    // Login & Registration
+    'login.phone': 'फ़ोन नंबर',
+    'login.phonePlaceholder': '+91 XXXXX XXXXX',
+    'login.otpPlaceholder': '6-अंकीय OTP',
+    'login.verifyOTP': 'OTP सत्यापित करें',
+
     // Navigation
     'nav.dashboard': 'डैशबोर्ड',
     'nav.managementDashboard': 'प्रबंधन डैशबोर्ड',
@@ -1073,7 +1101,6 @@ const translations: Record<string, Record<string, string>> = {
     // Map View
     'map.interactiveCoastalMap': 'इंटरैक्टिव तटीय नक्शा',
     'map.hazards': 'खतरे',
-    'map.weather': 'मौसम',
     'map.loadingMapData': 'नक्शा डेटा लोड हो रहा है...',
     'map.noReportsAvailable': 'दिखाने के लिए कोई रिपोर्ट उपलब्ध नहीं',
     'map.mapLayers': 'नक्शा परतें',
