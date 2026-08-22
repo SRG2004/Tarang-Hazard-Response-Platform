@@ -84,19 +84,34 @@ export function ReportHazard() {
             let photoURL = '';
             let videoURL = '';
 
+            // Helper function to upload to Cloudinary
+            const uploadToCloudinary = async (file: File) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', 'Tarang-Preset'); // Using the user's custom preset
+
+                const res = await fetch('https://api.cloudinary.com/v1_1/aa7u02k1/auto/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!res.ok) {
+                    throw new Error('Failed to upload media to Cloudinary');
+                }
+                const data = await res.json();
+                return data.secure_url;
+            };
+
             // Upload photo if exists
             if (photo) {
-                const photoRef = ref(storage, `hazard-photos/${Date.now()}_${photo.name}`);
-                await uploadBytes(photoRef, photo);
-                photoURL = await getDownloadURL(photoRef);
+                photoURL = await uploadToCloudinary(photo);
             }
 
             // Upload video if exists
             if (video) {
-                const videoRef = ref(storage, `hazard-videos/${Date.now()}_${video.name}`);
-                await uploadBytes(videoRef, video);
-                videoURL = await getDownloadURL(videoRef);
+                videoURL = await uploadToCloudinary(video);
             }
+
 
             // Create report
             const reportData = {
@@ -119,7 +134,15 @@ export function ReportHazard() {
 
             // Try online submission first
             try {
-                await addDoc(collection(db, 'reports'), reportData);
+                const docRef = await addDoc(collection(db, 'reports'), reportData);
+                
+                // Trigger backend AI analysis asynchronously
+                fetch(`${import.meta.env.VITE_API_URL || '/api'}/analyze-report`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reportId: docRef.id })
+                }).catch(err => console.error('Error triggering AI analysis:', err));
+
                 toast.success('Hazard reported successfully!');
             } catch (error) {
                 // If offline, queue for later

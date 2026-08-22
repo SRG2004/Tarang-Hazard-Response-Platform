@@ -20,7 +20,7 @@ export const GoogleMapsLoader = () => {
 
         // Create script tag
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&loading=async&callback=initMap`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry,marker&loading=async&callback=initMap`;
         script.async = true;
         script.defer = true;
         script.id = 'google-maps-script';

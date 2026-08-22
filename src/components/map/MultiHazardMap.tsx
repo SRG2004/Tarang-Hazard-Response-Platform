@@ -71,9 +71,12 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
 
 
 
+            const mapId = import.meta.env.VITE_GOOGLE_MAPS_ID || 'DEMO_MAP_ID';
+
             const map = new window.google.maps.Map(mapRef.current!, {
                 center,
                 zoom,
+                mapId,
                 mapTypeControl: true,
                 mapTypeControlOptions: {
                     style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
@@ -138,30 +141,22 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                 const hazardConfig = HAZARDS[report.type as HazardType];
                 if (!hazardConfig) return;
 
-                // Create standard legacy marker
+                // Create custom HTML element for AdvancedMarkerElement
                 const isUrgent = report.severity === 'critical' || report.severity === 'high';
-                const marker = new (window as any).google.maps.Marker({
+                const markerElement = document.createElement('div');
+                markerElement.className = `w-4 h-4 rounded-full border-2 border-white shadow-md ${isUrgent ? 'animate-pulse ring-4' : ''}`;
+                markerElement.style.backgroundColor = hazardConfig.color;
+                if (isUrgent) {
+                    markerElement.style.setProperty('--tw-ring-color', `${hazardConfig.color}80`); // 50% opacity ring
+                }
+
+                const marker = new (window as any).google.maps.marker.AdvancedMarkerElement({
                     position: { lat: report.latitude, lng: report.longitude },
                     title: report.title,
-                    optimized: false, // Required for custom CSS classes
-                    icon: {
-                        path: (window as any).google.maps.SymbolPath.CIRCLE,
-                        fillColor: hazardConfig.color,
-                        fillOpacity: 1,
-                        strokeColor: '#FFFFFF',
-                        strokeWeight: 2,
-                        scale: 10
-                    }
+                    content: markerElement,
+                    // Note: We intentionally don't set map here so MarkerClusterer can handle it,
+                    // or if no clustering, we set it manually in the fallback logic.
                 });
-
-                // Add blinking class if urgent
-                if (isUrgent) {
-                    // Note: Legacy markers don't support arbitrary CSS classes easily 
-                    // without custom overlays, but we can use AdvancedMarkerElement if available
-                    // or just set a custom property for now if we were using HTML markers.
-                    // For now, let's stick to the legend/circles and try to use AdvancedMarkerElement
-                    // if the version supports it.
-                }
 
                 // Create info window with improved styling for both light and dark modes
                 const infoWindow = new (window as any).google.maps.InfoWindow({
