@@ -8,10 +8,6 @@
     ],
     "rewrites": [
       {
-        "source": "/api/**",
-        "function": "apiV2"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }
@@ -59,24 +55,6 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local",
-        ".env",
-        ".env.*"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" install"
-      ]
-    }
-  ],
   "emulators": {
     "auth": {
       "port": 9099,
