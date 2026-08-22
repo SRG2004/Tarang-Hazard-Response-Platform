@@ -2,6 +2,25 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
+
+// Initialize Firebase Admin (Required for standalone hosting like Vercel)
+if (!admin.apps.length) {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+      console.log('✅ Firebase Admin initialized via FIREBASE_SERVICE_ACCOUNT');
+    } catch (e) {
+      console.error('❌ Failed to parse FIREBASE_SERVICE_ACCOUNT json:', e);
+      admin.initializeApp();
+    }
+  } else {
+    admin.initializeApp();
+    console.log('✅ Firebase Admin initialized via Application Default Credentials');
+  }
+}
 // Force backend update timestamp: 2026-01-24
 // Only load .env in local development, not during Firebase deployment
 // Firebase Functions already have environment variables set via Config/Secrets
