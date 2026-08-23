@@ -93,55 +93,43 @@ router.post('/chat', async (req, res) => {
                 parts: [{ text: msg.text }]
             })) : [];
 
-        // 3. Model Fallback Chains
-        // Prioritize 2.0-flash (Smartest/Fastest), then 1.5-flash (Standard), then Pro (Stable/Legacy)
-        const MODELS = ["gemini-1.5-flash", "gemini-1.5-pro"];
-        let lastError = null;
+        // 3. Use gemini-1.5-flash directly without fallback to expose true error
+        const modelName = "gemini-1.5-flash";
+        
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
 
-        for (const modelName of MODELS) {
-            try {
-                // console.log(`Attempting to generate with model: ${modelName}`); // Optional debug
-                const model = genAI.getGenerativeModel({ model: modelName });
+            const chat = model.startChat({
+                history: chatHistory,
+                generationConfig: {
+                    maxOutputTokens: 300,
+                    temperature: 0.4,
+                },
+            });
 
-                const chat = model.startChat({
-                    history: chatHistory,
-                    generationConfig: {
-                        maxOutputTokens: 300,
-                        temperature: 0.4,
-                    },
-                });
+            const fullPrompt = `${systemPrompt}\n\nUser Question: ${message}`;
 
-                const fullPrompt = `${systemPrompt}\n\nUser Question: ${message}`;
-
-                // Retry Mechanism specifically for Rate Limits (429)
-                let text;
-                const maxRetries = 3;
-                for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                    try {
-                        const result = await chat.sendMessage(fullPrompt);
-                        const response = await result.response;
-                        text = response.text();
-                        break; // Success
-                    } catch (err) {
-                        const isRateLimit = err.message.includes('429') || err.message.includes('Resource exhausted');
-                        if (isRateLimit && attempt < maxRetries) {
-                            const delay = 1000 * Math.pow(2, attempt - 1); // 1s, 2s, 4s
-                            console.warn(`Model ${modelName} hit 429. Retrying in ${delay}ms...`);
-                            await new Promise(r => setTimeout(r, delay));
-                        } else {
-                            throw err; // Re-throw to model loop (to try next model or fail)
-                        }
+            let text;
+            const maxRetries = 3;
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    const result = await chat.sendMessage(fullPrompt);
+                    const response = await result.response;
+                    text = response.text();
+                    break;
+                } catch (err) {
+                    const isRateLimit = err.message.includes('429') || err.message.includes('Resource exhausted');
+                    if (isRateLimit && attempt < maxRetries) {
+                        const delay = 1000 * Math.pow(2, attempt - 1);
+                        await new Promise(r => setTimeout(r, delay));
+                    } else {
+                        throw err;
                     }
                 }
-
-                // If we get here, we have text. Return it.
-                return res.json({ success: true, response: text, modelUsed: modelName });
-
-            } catch (error) {
-                console.warn(`Model ${modelName} failed:`, error.message);
-                lastError = error;
-                // Continue to next model in the list
             }
+            return res.json({ success: true, response: text, modelUsed: modelName });
+        } catch (error) {
+            throw error;
         }
 
         // 4. All Models Failed
