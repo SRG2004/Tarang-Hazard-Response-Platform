@@ -1,4 +1,4 @@
-const youtubeService = require('./youtubeService');
+const gdacsService = require('./gdacsService');
 const googleTrendsService = require('./googleTrendsService');
 const gnewsService = require('./gnewsService');
 const geminiService = require('./geminiService');
@@ -91,7 +91,7 @@ class OsintAggregator {
     async runAggregationPipeline() {
         console.log('--- Starting OSINT Pipeline ---');
         const start = Date.now();
-        const stats = { trends: 0, news: 0, youtube: 0, saved: 0 };
+        const stats = { trends: 0, news: 0, gdacs: 0, saved: 0 };
 
         try {
             // 1. Google Trends (Fastest, High Signal)
@@ -111,12 +111,12 @@ class OsintAggregator {
             }
             stats.news = newsItems.length;
 
-            // 3. YouTube (Visual Verification)
-            const videos = await youtubeService.searchHazardVideos(2);
-            stats.youtube = videos.length;
+            // 3. GDACS (Fastest Text Alerts)
+            const gdacsAlerts = await gdacsService.getRecentAlerts(2);
+            stats.gdacs = gdacsAlerts.length;
 
             // 4. Process All (Cap at 2 items total to prevent 30s Vercel timeouts)
-            const allRaw = [...trends, ...newsItems, ...videos].slice(0, 2);
+            const allRaw = [...trends, ...gdacsAlerts, ...newsItems].slice(0, 2);
             console.log(`[OSINT] Processing ${allRaw.length} raw items...`);
 
             const refinedItems = [];
