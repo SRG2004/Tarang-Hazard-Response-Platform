@@ -94,7 +94,7 @@ router.post('/chat', async (req, res) => {
             })) : [];
 
         // 3. Use gemini-1.5-flash directly without fallback to expose true error
-        const modelName = "gemini-2.5-flash";
+        const modelName = "gemini-3.6-flash";
         
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
@@ -154,7 +154,7 @@ router.get('/test-key', async (req, res) => {
         const keyPrefix = key.substring(0, 8) + "...";
         
         // Try calling the API
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
         const result = await model.generateContent("Say 'API IS WORKING'");
         const text = await result.response.text();
         
