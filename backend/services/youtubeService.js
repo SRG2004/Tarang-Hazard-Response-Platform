@@ -98,60 +98,43 @@ class YouTubeService {
       console.log('YouTube API key not configured, using Invidious fallback');
     }
 
-    // Fallback to Invidious RSS feeds
-    for (let attempt = 0; attempt < this.invidiousInstances.length; attempt++) {
-      try {
-        const instance = this.invidiousInstances[this.currentInvidiousIndex];
-        const encodedQuery = encodeURIComponent(query);
-        const rssUrl = `${instance}/search?q=${encodedQuery}&type=video&sort=relevance`;
+    // Fallback to Invidious RSS feeds (Run concurrently with strict 3s timeout to prevent 30s Vercel limit)
+    console.log('Trying all Invidious instances concurrently...');
+    
+    const fetchPromises = this.invidiousInstances.map(async (instance) => {
+      const encodedQuery = encodeURIComponent(query);
+      const rssUrl = `${instance}/search?q=${encodedQuery}&type=video&sort=relevance`;
 
-        console.log(`Trying Invidious (${instance}): ${rssUrl}`);
-
-        const response = await axios.get(rssUrl, {
-          timeout: 10000,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; TarangBot/1.0)',
-            'Accept': 'application/rss+xml, application/xml, text/xml'
-          }
-        });
-
-        if (response.status !== 200) {
-          console.error(`HTTP ${response.status} from ${instance}`);
-          this.currentInvidiousIndex = (this.currentInvidiousIndex + 1) % this.invidiousInstances.length;
-          continue;
+      const response = await axios.get(rssUrl, {
+        timeout: 3000, // strict 3 second timeout
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; TarangBot/1.0)',
+          'Accept': 'application/rss+xml, application/xml, text/xml'
         }
+      });
 
+      if (response.status === 200) {
         const feed = await this.parser.parseString(response.data);
         const videos = [];
-
         if (feed && feed.items) {
           for (const item of feed.items.slice(0, maxResults)) {
             const video = this.parseInvidiousVideo(item);
-            if (video) {
-              videos.push(video);
-            }
+            if (video) videos.push(video);
           }
         }
-
-        console.log(`Found ${videos.length} videos via Invidious (${instance})`);
-        return videos;
-
-      } catch (error) {
-        const errorMsg = error.message || 'Unknown error';
-        console.error(`Error with Invidious instance ${this.invidiousInstances[this.currentInvidiousIndex]}:`, errorMsg);
-
-        this.currentInvidiousIndex = (this.currentInvidiousIndex + 1) % this.invidiousInstances.length;
-
-        if (attempt === this.invidiousInstances.length - 1) {
-          console.error('All Invidious instances failed. No videos found.');
-          return [];
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        if (videos.length > 0) return videos;
       }
-    }
+      throw new Error('No videos found or invalid response');
+    });
 
-    return [];
+    try {
+      const fastestVideos = await Promise.any(fetchPromises);
+      console.log(`Found ${fastestVideos.length} videos via Invidious`);
+      return fastestVideos;
+    } catch (error) {
+      console.error('All Invidious instances failed or timed out. No videos found.');
+      return [];
+    }
   }
 
   /**

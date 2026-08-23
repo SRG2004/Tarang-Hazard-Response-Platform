@@ -100,9 +100,7 @@ async function searchNews(query, maxResults = 10, lang = 'en') {
     timeout: 10000,
   });
 
-  const allArticles = [];
-
-  for (const feed of RSS_FEEDS) {
+  const fetchPromises = RSS_FEEDS.map(async (feed) => {
     try {
       console.log(`Trying RSS feed: ${feed.name}`);
 
@@ -140,12 +138,16 @@ async function searchNews(query, maxResults = 10, lang = 'en') {
         feedSource: feed.name
       }));
 
-      allArticles.push(...formattedArticles);
+      return formattedArticles;
 
     } catch (error) {
       console.error(`Error fetching RSS feed ${feed.name}:`, error.message);
+      return [];
     }
-  }
+  });
+
+  const results = await Promise.all(fetchPromises);
+  const allArticles = results.flat();
 
   // Remove duplicates based on URL
   const uniqueArticles = Array.from(
