@@ -154,7 +154,7 @@ router.get('/test-key', async (req, res) => {
         const keyPrefix = key.substring(0, 8) + "...";
         
         // Try calling the API
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const result = await model.generateContent("Say 'API IS WORKING'");
         const text = await result.response.text();
         
