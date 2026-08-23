@@ -132,9 +132,6 @@ router.post('/chat', async (req, res) => {
             throw error;
         }
 
-        // 4. All Models Failed
-        throw lastError || new Error("All AI models failed to respond.");
-
     } catch (error) {
         console.error('Error in RAG Chat (All Fallbacks Failed):', error);
         res.status(500).json({
@@ -142,6 +139,36 @@ router.post('/chat', async (req, res) => {
             error: error.message,
             stack: error.stack,
             response: `System Error: ${error.message}. (Please check server logs)`
+        });
+    }
+});
+
+// Diagnostic endpoint to test the API key
+router.get('/test-key', async (req, res) => {
+    try {
+        const key = process.env.GEMINI_API_KEY || '';
+        if (!key) {
+            return res.json({ success: false, message: "No GEMINI_API_KEY found in environment variables." });
+        }
+        
+        const keyPrefix = key.substring(0, 8) + "...";
+        
+        // Try calling the API
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent("Say 'API IS WORKING'");
+        const text = await result.response.text();
+        
+        res.json({
+            success: true,
+            keyPrefix,
+            response: text
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            keyPrefix: (process.env.GEMINI_API_KEY || '').substring(0, 8) + "...",
+            errorMessage: error.message,
+            stack: error.stack
         });
     }
 });
