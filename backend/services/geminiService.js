@@ -42,7 +42,7 @@ async function withRetry(fn, maxRetries = 3, initialDelay = 1000) {
  */
 async function analyzeHazardContext(text, source = 'social_media') {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.0-pro' });
 
     // Create the prompt for hazard detection
     const prompt = `You are an AI assistant specialized in identifying ocean and coastal hazards.
@@ -160,7 +160,7 @@ async function batchAnalyzeHazards(texts) {
  */
 async function extractLocation(text) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.0-pro' });
 
     const prompt = `Extract location information from this text about an ocean or coastal event.
 
@@ -211,7 +211,7 @@ Respond with ONLY a valid JSON object (no markdown, no code blocks):
  */
 async function analyzeImage(imageBase64, mimeType = 'image/jpeg', textContext = '') {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.0-pro-vision-latest' });
 
     const prompt = `You are an AI assistant specialized in identifying natural disasters and hazards from images.
 
