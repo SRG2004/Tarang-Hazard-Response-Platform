@@ -142,9 +142,6 @@ async function searchNews(query, maxResults = 10, lang = 'en') {
 
       allArticles.push(...formattedArticles);
 
-      // Rate limiting between feeds
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
     } catch (error) {
       console.error(`Error fetching RSS feed ${feed.name}:`, error.message);
     }

@@ -115,16 +115,14 @@ class OsintAggregator {
             const videos = await youtubeService.searchHazardVideos(2);
             stats.youtube = videos.length;
 
-            // 4. Process All
-            const allRaw = [...trends, ...newsItems, ...videos];
+            // 4. Process All (Cap at 2 items total to prevent 30s Vercel timeouts)
+            const allRaw = [...trends, ...newsItems, ...videos].slice(0, 2);
             console.log(`[OSINT] Processing ${allRaw.length} raw items...`);
 
             const refinedItems = [];
             for (const raw of allRaw) {
                 const processed = await this.processItem(raw, raw.platform || 'unknown');
                 if (processed) refinedItems.push(processed);
-                // Rate limiting for Gemini
-                await new Promise(r => setTimeout(r, 500));
             }
 
             // 5. Save
