@@ -44,7 +44,7 @@ import { SyncStatus } from './components/SyncStatus';
 import { NotificationPermission } from './components/NotificationPermission';
 import { ChatBot } from './components/ChatBot';
 import { SmartAlertSystem } from './components/SmartAlertSystem';
-import { GoogleMapsLoader } from './components/GoogleMapsLoader';
+
 import { GeoMapBackground } from './components/ui/geo-map-background';
 import { Toaster } from './components/ui/sonner';
 import { cn } from './components/ui/utils';
@@ -365,7 +365,7 @@ function AppContent() {
       <SmartAlertSystem />
       <NotificationPermission />
       <Toaster />
-      <GoogleMapsLoader />
+
 
       {/* Floating Action Button for Citizens on Mobile */}
       {currentUser?.role === 'citizen' && (

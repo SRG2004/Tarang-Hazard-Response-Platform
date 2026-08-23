@@ -1,4 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { HAZARDS } from '../../config/hazards';
 import { HazardType, HazardReport } from '../../types';
 import { collection, query, getDocs } from 'firebase/firestore';
@@ -17,20 +20,58 @@ interface MultiHazardMapProps {
     };
 }
 
+// Component to handle dynamic map updates
+const MapUpdater: React.FC<{ center: { lat: number; lng: number }; zoom: number }> = ({ center, zoom }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView([center.lat, center.lng], zoom);
+    }, [center, zoom, map]);
+    return null;
+};
+
+// Helper function to create custom DivIcon
+const createCustomIcon = (color: string, isUrgent: boolean) => {
+    return L.divIcon({
+        className: 'custom-leaflet-marker',
+        html: `<div style="
+            width: 16px; 
+            height: 16px; 
+            background-color: ${color}; 
+            border-radius: 50%; 
+            border: 2px solid white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            ${isUrgent ? `animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; box-shadow: 0 0 0 4px ${color}80;` : ''}
+        "></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+        popupAnchor: [0, -10]
+    });
+};
+
 export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
     center = { lat: 20.5937, lng: 78.9629 }, // India Center
     zoom = 5,
-    showAllHazards = true,
     selectedSeverity = ['all'],
     selectedTypes = ['all'],
     activeLayers = { hazards: true, resources: true, satellite: false }
 }) => {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const googleMapRef = useRef<any>(null);
-    const markersRef = useRef<any[]>([]);
-    const circlesRef = useRef<any[]>([]);
-    const markerClustererRef = useRef<any>(null); // MarkerClusterer instance
     const [reports, setReports] = useState<HazardReport[]>([]);
+
+    useEffect(() => {
+        // Add pulse animation styles
+        if (!document.getElementById('leaflet-pulse-style')) {
+            const style = document.createElement('style');
+            style.id = 'leaflet-pulse-style';
+            style.innerHTML = `
+                @keyframes pulse-ring {
+                    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7); }
+                    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
+                    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }, []);
 
     // Load Hazard Reports (VERIFIED ONLY)
     useEffect(() => {
@@ -41,13 +82,12 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
                 const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as HazardReport));
 
                 // FILTER: Only show verified or solved reports on the map
-                // This ensures auto-rejected (low confidence) and pending reports don't appear
                 const verifiedData = allData.filter(report =>
                     report.status === 'verified' || report.status === 'solved'
                 );
 
                 setReports(verifiedData);
-                console.log(`Loaded ${verifiedData.length} verified reports (filtered from ${allData.length} total)`);
+                console.log(`Loaded ${verifiedData.length} verified reports`);
             } catch (error) {
                 console.error("Error loading map data:", error);
             }
@@ -56,198 +96,117 @@ export const MultiHazardMap: React.FC<MultiHazardMapProps> = ({
         fetchReports();
     }, []);
 
-    // Initialize Google Map
-    useEffect(() => {
-        if (!mapRef.current || googleMapRef.current) return;
+    // Filter reports based on props
+    const filteredReports = reports.filter(report => {
+        if (!activeLayers.hazards) return false;
+        if (!selectedTypes.includes('all') && !selectedTypes.includes(report.type)) return false;
+        if (!selectedSeverity.includes('all') && !selectedSeverity.includes(report.severity)) return false;
+        return true;
+    });
 
-        // Wait for Google Maps to be ready
-        const initMap = () => {
-            if (typeof window.google?.maps?.Map !== 'function') {
-                console.log('⏳ Google Maps not ready yet');
-                return false;
-            }
-
-            console.log('🗺️ Initializing Google Map');
-
-
-
-            const mapId = import.meta.env.VITE_GOOGLE_MAPS_ID || 'DEMO_MAP_ID';
-
-            const map = new window.google.maps.Map(mapRef.current!, {
-                center,
-                zoom,
-                mapId,
-                mapTypeControl: true,
-                mapTypeControlOptions: {
-                    style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-                    position: window.google.maps.ControlPosition.TOP_RIGHT,
-                    mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain']
-                },
-                zoomControl: true,
-                streetViewControl: false,
-                fullscreenControl: true,
-            });
-
-            googleMapRef.current = map;
-            console.log('✅ Google Map initialized');
-            return true;
-        };
-
-        // Poll for Google Maps
-        let attempts = 0;
-        const maxAttempts = 50;
-        const checkInterval = setInterval(() => {
-            attempts++;
-            if (initMap()) {
-                clearInterval(checkInterval);
-            } else if (attempts >= maxAttempts) {
-                console.error('❌ Failed to initialize Google Map');
-                clearInterval(checkInterval);
-            }
-        }, 100);
-
-        return () => clearInterval(checkInterval);
-    }, [center, zoom]);
-
-    // Update markers when reports or active layers change
-    useEffect(() => {
-        if (!googleMapRef.current) return;
-
-        // Clear existing markers, circles, and clusterer
-        markersRef.current.forEach(marker => marker.setMap(null));
-        circlesRef.current.forEach(circle => circle.setMap(null));
-        if (markerClustererRef.current) {
-            markerClustererRef.current.clearMarkers();
+    const getBaseLayerUrl = () => {
+        if (activeLayers.satellite) {
+            return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
         }
-        markersRef.current = [];
-        circlesRef.current = [];
-
-        const newMarkers: any[] = [];
-
-        // Update Satellite View
-        if (googleMapRef.current) {
-            googleMapRef.current.setMapTypeId(activeLayers.satellite ? 'satellite' : 'roadmap');
-        }
-
-        // Add markers for active hazards
-        if (activeLayers.hazards) {
-            reports.forEach(report => {
-                // Filter by Type
-                if (!selectedTypes.includes('all') && !selectedTypes.includes(report.type)) return;
-
-                // Filter by Severity
-                if (!selectedSeverity.includes('all') && !selectedSeverity.includes(report.severity)) return;
-
-                const hazardConfig = HAZARDS[report.type as HazardType];
-                if (!hazardConfig) return;
-
-                // Create custom HTML element for AdvancedMarkerElement
-                const isUrgent = report.severity === 'critical' || report.severity === 'high';
-                const markerElement = document.createElement('div');
-                markerElement.className = `w-4 h-4 rounded-full border-2 border-white shadow-md ${isUrgent ? 'animate-pulse ring-4' : ''}`;
-                markerElement.style.backgroundColor = hazardConfig.color;
-                if (isUrgent) {
-                    markerElement.style.setProperty('--tw-ring-color', `${hazardConfig.color}80`); // 50% opacity ring
-                }
-
-                const marker = new (window as any).google.maps.marker.AdvancedMarkerElement({
-                    position: { lat: report.latitude, lng: report.longitude },
-                    title: report.title,
-                    content: markerElement,
-                    // Note: We intentionally don't set map here so MarkerClusterer can handle it,
-                    // or if no clustering, we set it manually in the fallback logic.
-                });
-
-                // Create info window with improved styling for both light and dark modes
-                const infoWindow = new (window as any).google.maps.InfoWindow({
-                    content: `
-                    <div style="padding: 16px; max-width: 320px; font-family: Inter, system-ui, sans-serif; border-radius: 12px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                            <h3 style="font-weight: 700; font-size: 18px; margin: 0; color: #1e293b;">${report.title}</h3>
-                            <span style="padding: 4px 10px; border-radius: 20px; background-color: ${hazardConfig.color}; color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                                ${report.severity}
-                            </span>
-                        </div>
-                        
-                        <div style="margin-bottom: 12px; border-left: 3px solid ${hazardConfig.color}; padding-left: 12px;">
-                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.5;">${report.description || 'No detailed description provided.'}</p>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-                            <div>
-                                <span style="display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Status</span>
-                                <span style="font-size: 13px; font-weight: 600; color: #334155;">${report.status?.toUpperCase() || 'NEW'}</span>
-                            </div>
-                            <div>
-                                <span style="display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Time</span>
-                                <span style="font-size: 13px; font-weight: 600; color: #334155;">
-                                    ${(() => {
-                            try {
-                                const ts = report.submittedAt as any;
-                                if (!ts) return 'Unknown';
-                                if (typeof ts.toDate === 'function') {
-                                    return ts.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                }
-                                const date = new Date(ts);
-                                return isNaN(date.getTime()) ? 'Unknown' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            } catch { return 'Unknown'; }
-                        })()}
-                                </span>
-                            </div>
-                        </div>
-
-
-                    </div>
-                `
-                });
-
-                marker.addListener('click', () => {
-                    infoWindow.open(googleMapRef.current!, marker);
-                });
-
-                newMarkers.push(marker);
-
-                // Create risk radius circle
-                const radius = report.severity === 'critical' ? 5000 : report.severity === 'high' ? 3000 : 1000;
-                const circle = new (window as any).google.maps.Circle({
-                    strokeColor: hazardConfig.color,
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: hazardConfig.color,
-                    fillOpacity: 0.2,
-                    map: googleMapRef.current!,
-                    center: { lat: report.latitude, lng: report.longitude },
-                    radius: radius
-                });
-
-                circlesRef.current.push(circle);
-            });
-        }
-
-        markersRef.current = newMarkers;
-
-        // Initialize MarkerClusterer if available
-        const win = window as any;
-        if (typeof win.markerClusterer !== 'undefined' && win.markerClusterer.MarkerClusterer) {
-            markerClustererRef.current = new win.markerClusterer.MarkerClusterer({
-                map: googleMapRef.current,
-                markers: newMarkers
-            });
-        } else {
-            // Fallback: add markers directly without clustering
-            console.warn('MarkerClusterer not loaded, adding markers without clustering');
-            newMarkers.forEach(marker => marker.setMap(googleMapRef.current!));
-        }
-
-        console.log(`📍 Added ${newMarkers.length} markers with clustering`);
-    }, [reports, activeLayers, selectedSeverity, selectedTypes]);
+        return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    };
 
     return (
-        <div className="h-full w-full relative z-0">
-            <div ref={mapRef} className="h-[calc(100vh-64px)] w-full" />
+        <div className="relative w-full h-[calc(100vh-64px)] bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 z-0">
+            <MapContainer
+                center={[center.lat, center.lng]}
+                zoom={zoom}
+                style={{ width: '100%', height: '100%', zIndex: 0 }}
+                zoomControl={true}
+                scrollWheelZoom={true}
+            >
+                <MapUpdater center={center} zoom={zoom} />
+                
+                <TileLayer
+                    url={getBaseLayerUrl()}
+                    attribution={activeLayers.satellite 
+                        ? 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }
+                />
 
-            {/* Legend */}
-            <div className="absolute bottom-8 left-8 z-[1000] bg-white p-4 rounded-lg shadow-lg border border-gray-200 hidden md:block">
+                {filteredReports.map(report => {
+                    const hazardConfig = HAZARDS[report.type as HazardType];
+                    if (!hazardConfig) return null;
+
+                    const isUrgent = report.severity === 'critical' || report.severity === 'high';
+                    const icon = createCustomIcon(hazardConfig.color, isUrgent);
+
+                    // Map specific radii based on severity
+                    let radius = 1000; // default 1km
+                    if (report.severity === 'critical') radius = 5000;
+                    if (report.severity === 'high') radius = 3000;
+
+                    return (
+                        <React.Fragment key={report.id}>
+                            <Marker
+                                position={[report.latitude, report.longitude]}
+                                icon={icon}
+                            >
+                                <Popup>
+                                    <div className="p-1 max-w-[280px]">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h3 className="font-bold text-gray-900 m-0 leading-tight">
+                                                {report.title || hazardConfig.label}
+                                            </h3>
+                                            <span className="inline-block px-2 py-1 rounded text-[10px] font-bold text-white uppercase" style={{ backgroundColor: hazardConfig.color }}>
+                                                {report.severity}
+                                            </span>
+                                        </div>
+                                        <div className="mb-2 pl-3 border-l-2" style={{ borderColor: hazardConfig.color }}>
+                                            <p className="text-sm text-gray-700 m-0 line-clamp-3">
+                                                {report.description || 'No detailed description provided.'}
+                                            </p>
+                                        </div>
+                                        <div className="mt-2 text-xs text-gray-500 flex justify-between border-t pt-2">
+                                            <span className="font-semibold text-gray-700">{report.status?.toUpperCase() || 'NEW'}</span>
+                                            <span className="truncate max-w-[120px]">{report.location}</span>
+                                        </div>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                            
+                            <Circle
+                                center={[report.latitude, report.longitude]}
+                                radius={radius}
+                                pathOptions={{
+                                    color: hazardConfig.color,
+                                    fillColor: hazardConfig.color,
+                                    fillOpacity: isUrgent ? 0.3 : 0.1,
+                                    weight: 1
+                                }}
+                            />
+                        </React.Fragment>
+                    );
+                })}
+            </MapContainer>
+
+            {/* Floating Legends */}
+            <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400] pointer-events-none hidden md:flex">
+                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 flex flex-col gap-1 pointer-events-auto text-xs">
+                    <div className="font-semibold text-slate-700 dark:text-slate-300 mb-1">Severity Indicator</div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500 ring-2 ring-red-500/50"></div>
+                        <span className="text-slate-600 dark:text-slate-400">Critical (5km radius)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                        <span className="text-slate-600 dark:text-slate-400">High (3km radius)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <span className="text-slate-600 dark:text-slate-400">Medium (1km radius)</span>
+                    </div>
+                </div>
+            </div>
+            
+            {/* Legend for active hazards */}
+            <div className="absolute bottom-6 left-6 z-[400] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-200 hidden md:block">
                 <h4 className="font-bold text-gray-800 mb-2">Active Hazards</h4>
                 <div className="space-y-2">
                     {Object.values(HAZARDS).map(hazard => (

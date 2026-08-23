@@ -9,60 +9,26 @@ interface PlacesAutocompleteProps {
     className?: string;
 }
 
+interface NominatimResult {
+    place_id: number;
+    display_name: string;
+    lat: string;
+    lon: string;
+}
+
 export function PlacesAutocomplete({
     value,
     onChange,
     placeholder = 'Search for a location...',
     className = ''
 }: PlacesAutocompleteProps) {
-    const [isReady, setIsReady] = useState(false);
+    const [isReady, setIsReady] = useState(true);
     const [error, setError] = useState<string>('');
-    const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+    const [predictions, setPredictions] = useState<NominatimResult[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
     
-    const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
-    const placesService = useRef<google.maps.places.PlacesService | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        let attempts = 0;
-        const maxAttempts = 100;
-
-        const initServices = () => {
-            if (typeof window.google?.maps?.places?.AutocompleteService !== 'function') {
-                return false;
-            }
-
-            try {
-                autocompleteService.current = new window.google.maps.places.AutocompleteService();
-                // Create a dummy div for PlacesService since it requires an HTML element
-                placesService.current = new window.google.maps.places.PlacesService(document.createElement('div'));
-                
-                setIsReady(true);
-                setError('');
-                console.log('✅ Autocomplete Service ready!');
-                return true;
-            } catch (err) {
-                console.error('❌ Error:', err);
-                setError('Failed to initialize');
-                return false;
-            }
-        };
-
-        const checkInterval = setInterval(() => {
-            attempts++;
-            if (initServices()) {
-                clearInterval(checkInterval);
-            } else if (attempts >= maxAttempts) {
-                console.error('❌ Timeout');
-                setError('Search unavailable');
-                setIsReady(true);
-                clearInterval(checkInterval);
-            }
-        }, 100);
-
-        return () => clearInterval(checkInterval);
-    }, []);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Close dropdown on click outside
     useEffect(() => {
@@ -75,66 +41,60 @@ export function PlacesAutocomplete({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleInputChange = (inputValue: string) => {
-        onChange(inputValue); // Update the input value in parent
-        
-        if (!inputValue.trim()) {
-            setPredictions([]);
-            setShowDropdown(false);
-            return;
-        }
-
-        if (autocompleteService.current) {
-            autocompleteService.current.getPlacePredictions(
-                { 
-                    input: inputValue,
-                    componentRestrictions: { country: 'in' },
-                    types: ['geocode', 'establishment']
-                },
-                (results, status) => {
-                    if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-                        setPredictions(results);
-                        setShowDropdown(true);
-                    } else {
-                        setPredictions([]);
-                        setShowDropdown(false);
+    const searchNominatim = async (query: string) => {
+        try {
+            // Add viewbox for India to prioritize local results
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`,
+                {
+                    headers: {
+                        'Accept-Language': 'en'
                     }
                 }
             );
+            
+            if (!response.ok) throw new Error('Network error');
+            
+            const data: NominatimResult[] = await response.json();
+            setPredictions(data);
+            setShowDropdown(data.length > 0);
+        } catch (err) {
+            console.error('Nominatim search error:', err);
+            setPredictions([]);
+            setShowDropdown(false);
         }
     };
 
-    const handleSelect = (prediction: google.maps.places.AutocompletePrediction) => {
-        const address = prediction.description;
-        onChange(address); // Optimistically set the address
+    const handleInputChange = (inputValue: string) => {
+        onChange(inputValue); // Update the input value in parent
+        
+        if (!inputValue.trim() || inputValue.trim().length < 3) {
+            setPredictions([]);
+            setShowDropdown(false);
+            if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+            return;
+        }
+
+        // Debounce search to avoid hitting the free API too hard
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        searchTimeoutRef.current = setTimeout(() => {
+            searchNominatim(inputValue);
+        }, 500);
+    };
+
+    const handleSelect = (prediction: NominatimResult) => {
+        const address = prediction.display_name;
+        const lat = parseFloat(prediction.lat);
+        const lng = parseFloat(prediction.lon);
+        
+        onChange(address, lat, lng);
         setShowDropdown(false);
         setPredictions([]);
-
-        if (placesService.current) {
-            placesService.current.getDetails(
-                {
-                    placeId: prediction.place_id,
-                    fields: ['geometry', 'formatted_address', 'name', 'types']
-                },
-                (place, status) => {
-                    if (status === window.google.maps.places.PlacesServiceStatus.OK && place && place.geometry?.location) {
-                        const lat = place.geometry.location.lat();
-                        const lng = place.geometry.location.lng();
-                        const finalAddress = place.formatted_address || place.name || address;
-                        
-                        console.log('📍 Selected:', finalAddress);
-                        onChange(finalAddress, lat, lng);
-
-                        if (window.gtag) {
-                            window.gtag('event', 'place_selected', {
-                                place_name: place.name,
-                                place_type: place.types?.[0] || 'unknown'
-                            });
-                        }
-                    }
-                }
-            );
-        }
+        
+        console.log('📍 Selected:', address);
     };
 
     return (
@@ -149,12 +109,6 @@ export function PlacesAutocomplete({
                 className={`pl-10 ${className}`}
                 disabled={!isReady && !error}
             />
-            
-            {!isReady && !error && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full"></div>
-                </div>
-            )}
 
             {showDropdown && predictions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 overflow-hidden">
@@ -165,7 +119,7 @@ export function PlacesAutocomplete({
                                 className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-800 dark:text-gray-200 transition-colors"
                                 onClick={() => handleSelect(prediction)}
                             >
-                                {prediction.description}
+                                {prediction.display_name}
                             </li>
                         ))}
                     </ul>

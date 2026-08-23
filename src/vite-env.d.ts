@@ -29,9 +29,7 @@ interface Window {
         PaymentsClient: new (config: any) => any;
       };
     };
-    maps?: typeof google.maps;
   };
   gtag?: (...args: any[]) => void;
-  initMap?: () => void;
 }
 
