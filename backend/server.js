@@ -3,6 +3,37 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
+// Run validation on startup
+// validateEnvironmentVariables();
+
+const app = express();
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://tarang-484812.web.app',
+      'https://tarang-484812.firebaseapp.com',
+      'https://tarang-frontend-system.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5173'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Initialize Firebase Admin (Required for standalone hosting like Vercel)
 if (!admin.apps.length) {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
@@ -55,26 +86,6 @@ const validateEnvironmentVariables = () => {
   return { errors, warnings };
 };
 
-// Run validation on startup
-// validateEnvironmentVariables();
-
-const app = express();
-
-// CORS configuration - Allow requests from the frontend domain
-const corsOptions = {
-  origin: [
-    'https://tarang-484812.web.app',
-    'https://tarang-484812.firebaseapp.com',
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Middleware to strip /api prefix if present (canonicalize paths)
 // This supports both direct function access and hosting rewrites
