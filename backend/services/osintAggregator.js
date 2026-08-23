@@ -103,16 +103,16 @@ class OsintAggregator {
             let newsItems = [];
             if (trends.length > 0) {
                 for (const trend of trends) {
-                    const trendNews = await gnewsService.searchNews(trend.keyword, 3);
+                    const trendNews = await gnewsService.searchNews(trend.keyword, 1);
                     newsItems.push(...trendNews);
                 }
             } else {
-                newsItems = await gnewsService.monitorHazardNews(15);
+                newsItems = await gnewsService.monitorHazardNews(2);
             }
             stats.news = newsItems.length;
 
             // 3. YouTube (Visual Verification)
-            const videos = await youtubeService.searchHazardVideos(15);
+            const videos = await youtubeService.searchHazardVideos(2);
             stats.youtube = videos.length;
 
             // 4. Process All

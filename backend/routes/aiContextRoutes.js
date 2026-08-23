@@ -95,7 +95,7 @@ router.post('/chat', async (req, res) => {
 
         // 3. Model Fallback Chains
         // Prioritize 2.0-flash (Smartest/Fastest), then 1.5-flash (Standard), then Pro (Stable/Legacy)
-        const MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro"];
+        const MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"];
         let lastError = null;
 
         for (const modelName of MODELS) {

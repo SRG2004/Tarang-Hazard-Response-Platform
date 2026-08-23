@@ -1655,7 +1655,7 @@ function calculateOverallConfidence(aiAnalysis) {
 }
 
 // ==================== AI ANALYSIS TRIGGER REPLACEMENT ====================
-app.post('/api/analyze-report', async (req, res) => {
+app.post('/analyze-report', async (req, res) => {
   const { reportId } = req.body;
   if (!reportId) {
     return res.status(400).json({ success: false, error: 'reportId is required' });
