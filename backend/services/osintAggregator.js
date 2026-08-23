@@ -1,4 +1,5 @@
 const gdacsService = require('./gdacsService');
+const sachetService = require('./sachetService');
 const googleTrendsService = require('./googleTrendsService');
 const gnewsService = require('./gnewsService');
 const geminiService = require('./geminiService');
@@ -91,7 +92,7 @@ class OsintAggregator {
     async runAggregationPipeline() {
         console.log('--- Starting OSINT Pipeline ---');
         const start = Date.now();
-        const stats = { trends: 0, news: 0, gdacs: 0, saved: 0 };
+        const stats = { trends: 0, news: 0, gdacs: 0, sachet: 0, saved: 0 };
 
         try {
             // 1. Google Trends (Fastest, High Signal)
@@ -111,12 +112,16 @@ class OsintAggregator {
             }
             stats.news = newsItems.length;
 
-            // 3. GDACS (Fastest Text Alerts)
+            // 3. GDACS (Fastest Global Text Alerts)
             const gdacsAlerts = await gdacsService.getRecentAlerts(2);
             stats.gdacs = gdacsAlerts.length;
 
-            // 4. Process All (Cap at 2 items total to prevent 30s Vercel timeouts)
-            const allRaw = [...trends, ...gdacsAlerts, ...newsItems].slice(0, 2);
+            // 4. SACHET (Fastest Indian Text Alerts)
+            const sachetAlerts = await sachetService.getRecentAlerts(2);
+            stats.sachet = sachetAlerts.length;
+
+            // 5. Process All (Cap at 3 items total to prevent 30s Vercel timeouts)
+            const allRaw = [...trends, ...sachetAlerts, ...gdacsAlerts, ...newsItems].slice(0, 3);
             console.log(`[OSINT] Processing ${allRaw.length} raw items...`);
 
             const refinedItems = [];
