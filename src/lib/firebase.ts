@@ -8,13 +8,13 @@ import { getAnalytics } from "firebase/analytics";
 // Firebase configuration
 // Vite uses import.meta.env instead of process.env
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-auth-domain",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-storage-bucket",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-messaging-sender-id",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-NKD321JP34"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDua-PbolOEK2lWJ4ZQQ7pmcxJH_pk7bmU",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "tarang-484812.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "tarang-484812",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "tarang-484812.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1051783450418",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1051783450418:web:ac515bf815083df899d12b",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-PSB8S84T02"
 };
 
 // Initialize Firebase - wrap in try-catch to prevent blocking on errors
