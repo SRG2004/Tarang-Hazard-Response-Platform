@@ -178,6 +178,15 @@ const alertRoutes = require('./routes/alertRoutes');
 const aiRoutes = require('./routes/aiContextRoutes');
 const osintRoutes = require('./routes/osintRoutes');
 const adminRoutes = require('./routes/adminRoutes'); // New
+const userRoutes = require('./routes/userRoutes');
+const volunteerRoutes = require('./routes/volunteerRoutes');
+const resourceRoutes = require('./routes/resourceRoutes');
+const drillRoutes = require('./routes/drillRoutes');
+const impactRoutes = require('./routes/impactRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+const infrastructureRoutes = require('./routes/infrastructureRoutes');
+const donationRoutes = require('./routes/donationRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 
 app.use('/auth', authRoutes);
@@ -187,6 +196,15 @@ app.use('/alerts', verifyAuth, alertRoutes);
 app.use('/ai', aiRoutes);
 app.use('/osint', verifyAuth, osintRoutes);
 app.use('/reports', verifyAuth, require('./routes/reportRoutes'));
+app.use('/users', verifyAuth, userRoutes);
+app.use('/volunteers', volunteerRoutes);
+app.use('/resource-requests', resourceRoutes);
+app.use('/drills', drillRoutes);
+app.use('/impact-reports', impactRoutes);
+app.use('/contacts', contactRoutes);
+app.use('/infrastructure', infrastructureRoutes);
+app.use('/donations', donationRoutes);
+app.use('/', analyticsRoutes);
 
 // API Status endpoint - Check which APIs are configured
 app.get('/status', verifyAuth, async (req, res) => {
@@ -816,7 +834,7 @@ app.get('/resource-requests', verifyAuth, async (req, res) => {
     if (requesterId) query = query.where('requesterId', '==', requesterId);
     if (status) query = query.where('status', '==', status);
 
-    const snapshot = await query.orderBy('requestedAt', 'desc').get();
+    const snapshot = await query.get();
     const requests = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),

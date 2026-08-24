@@ -44,6 +44,10 @@ export const ROLES_CONFIG: Record<UserRole, RoleConfig> = {
             '/resource-management',
             '/emergency-dispatch',
             '/field-verifications',
+            '/field-verification',
+            '/field-teams',
+            '/report-hazard',
+            '/impact-reporting',
             '/impact-reports'
         ],
         defaultRoute: '/dashboard',

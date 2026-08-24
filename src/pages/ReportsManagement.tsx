@@ -46,16 +46,20 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 
+function getParsedDate(dateValue: any): Date {
+  if (!dateValue) return new Date(0);
+  if (typeof dateValue.toDate === 'function') return dateValue.toDate();
+  if (typeof dateValue === 'object' && ('_seconds' in dateValue || 'seconds' in dateValue)) {
+    const secs = dateValue._seconds || dateValue.seconds;
+    return new Date(secs * 1000);
+  }
+  return new Date(dateValue);
+}
+
 function formatDate(dateValue: any) {
   if (!dateValue) return 'Unknown Date';
-  // Handle Firestore Timestamp (has toDate method)
-  if (dateValue && typeof dateValue.toDate === 'function') {
-    return dateValue.toDate().toLocaleDateString();
-  }
-  // Handle standard Date object or valid date string/number
   try {
-    const date = new Date(dateValue);
-    // Check if date is valid
+    const date = getParsedDate(dateValue);
     if (isNaN(date.getTime())) return 'Invalid Date';
     return date.toLocaleDateString();
   } catch (e) {
@@ -136,8 +140,8 @@ export function ReportsManagement() {
 
     // 2. Rejected Report Retention Logic (Show only if rejected < 1 hour ago)
     if (report.status === 'rejected') {
-      const rejectionTime = report.rejectedAt ? new Date(report.rejectedAt).getTime() :
-        (report.updatedAt ? new Date(report.updatedAt).getTime() : 0);
+      const rejectionTime = report.rejectedAt ? getParsedDate(report.rejectedAt).getTime() : 
+        (report.updatedAt ? getParsedDate(report.updatedAt).getTime() : 0);
 
       const oneHour = 60 * 60 * 1000;
       const timeSinceRejection = Date.now() - rejectionTime;
@@ -170,13 +174,13 @@ export function ReportsManagement() {
         return;
       }
 
-      const reportTime = new Date(report.submittedAt).getTime();
+      const reportTime = getParsedDate(report.submittedAt).getTime();
 
       // Find existing cluster within radius AND time window
       const existingCluster = clusters.find(cluster => {
         if (!cluster.isCluster || !cluster.latitude || !cluster.submittedAt) return false;
 
-        const clusterTime = new Date(cluster.submittedAt).getTime();
+        const clusterTime = getParsedDate(cluster.submittedAt).getTime();
         const timeDiff = Math.abs(reportTime - clusterTime);
 
         // Check both spatial AND temporal proximity
@@ -208,7 +212,7 @@ export function ReportsManagement() {
   function getTimeRange(reports: any[]): string {
     if (reports.length === 1) return 'single event';
 
-    const times = reports.map(r => new Date(r.submittedAt).getTime());
+    const times = reports.map(r => getParsedDate(r.submittedAt).getTime());
     const minTime = Math.min(...times);
     const maxTime = Math.max(...times);
     const hoursDiff = Math.round((maxTime - minTime) / (60 * 60 * 1000));
@@ -540,7 +544,7 @@ export function ReportsManagement() {
                           <div className="space-y-1">
                             {report.contextualData.historicalMatches.slice(0, 2).map((match: any, idx: number) => (
                               <p key={idx} className="text-xs text-gray-600 dark:text-gray-400 pl-2">
-                                • {match.title} ({match.distance}km away, {new Date(match.date).toLocaleDateString()})
+                                • {match.title} ({match.distance}km away, {formatDate(match.date)})
                               </p>
                             ))}
                           </div>

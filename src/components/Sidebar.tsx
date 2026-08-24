@@ -45,21 +45,8 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
   const [isVisible, setIsVisible] = useState(!isMobile);
 
   useEffect(() => {
-    if (isMobile) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      // Show sidebar when mouse is near left edge (within 50px)
-      if (e.clientX < 50) {
-        setIsVisible(true);
-      }
-      // Hide sidebar when mouse moves away (beyond 300px)
-      else if (e.clientX > 300 && !isCollapsed) {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    // Disable hover-show logic to ensure static robust sidebar layout
+    setIsVisible(true);
   }, [isCollapsed, isMobile]);
 
   // Master list of all possible navigation items
@@ -123,13 +110,12 @@ export function Sidebar({ userRole, currentPage, onNavigate, onLogout, isCollaps
       </AnimatePresence>
 
       <motion.aside
-        initial={{ x: isMobile ? 0 : -280 }}
-        animate={{ x: (isVisible || isMobile) ? 0 : -280 }}
+        initial={{ x: isMobile ? -280 : 0 }}
+        animate={{ x: isMobile ? (isVisible ? 0 : -280) : 0 }}
         transition={{ duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
         className={cn(
           "h-screen w-[280px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-md text-gray-900 dark:text-white shadow-2xl flex flex-col border-r border-gray-200/50 dark:border-gray-800/50",
-          !isMobile && "fixed left-0 top-0 z-50",
-          isMobile && "w-full"
+          isMobile ? "fixed left-0 top-0 z-[100]" : "relative z-20 shrink-0"
         )}
       >
         {/* Logo Section */}

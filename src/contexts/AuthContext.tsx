@@ -763,6 +763,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Clear session storage to prevent flash on next load
       sessionStorage.removeItem('tarang_auth_active');
       await signOut(auth);
+      setCurrentUser(null);
       setUserProfile(null);
     } catch (error) {
       throw error;

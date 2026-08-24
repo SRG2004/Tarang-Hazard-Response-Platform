@@ -228,7 +228,7 @@ function AppContent() {
     return (
       <div className="flex flex-1 overflow-hidden relative z-10 w-full h-full">
         {/* Sidebar for desktop */}
-        <div className="hidden lg:block relative z-20">
+        <div className="hidden lg:block relative z-20 w-[280px] shrink-0">
           <Sidebar
             userRole={currentUser!.role}
             currentPage={currentPageKey}

@@ -21,7 +21,7 @@ interface EmergencyReport {
 }
 
 export function EmergencyDispatch() {
-    const { user } = useAuth();
+    const { currentUser } = useAuth();
     const [reports, setReports] = useState<EmergencyReport[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeResponse, setActiveResponse] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export function EmergencyDispatch() {
     const handleRespond = async (reportId: string) => {
         try {
             await updateDoc(doc(db, 'reports', reportId), {
-                responderId: user?.uid,
+                responderId: currentUser?.uid || 'unknown_responder',
                 responseStartTime: new Date(),
                 status: 'in-progress'
             });
@@ -123,19 +123,19 @@ export function EmergencyDispatch() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <InfoCard
                     title={reports.filter(r => r.severity === 'critical').length.toString()}
-                    subtitle="Critical Alerts"
+                    description="Critical Alerts"
                     icon={AlertTriangle}
                     iconColor="#DC2626"
                 />
                 <InfoCard
                     title={reports.filter(r => r.severity === 'high').length.toString()}
-                    subtitle="High Priority"
+                    description="High Priority"
                     icon={AlertTriangle}
                     iconColor="#F59E0B"
                 />
                 <InfoCard
                     title={activeResponse ? '1' : '0'}
-                    subtitle="Active Response"
+                    description="Active Response"
                     icon={CheckCircle}
                     iconColor="#10B981"
                 />
